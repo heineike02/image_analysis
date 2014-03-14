@@ -1,15 +1,18 @@
-JSO code for microscope control as of 12/12/12
+BMH code for image analysis as of 17JUL2013
+based on JSO code for image analysis as of 12/12/12
 
--->designed for analysis of images collected by JSO microscope scripts
+-->designed for analysis of images collected by JSO microscope scripts and micromanager
 
--->primary functions are
-	(1)CovMapCell -- takes image series from microscope, finds cells in each image
-	(2)AlignCellsIMCT -- takes cell list from CovMapCell, constructs full cell traces
-		-also see aligncell, aligncellsIM, aligncellsKmeans (all functional but some tradeoffs, IMCT is probably the best although slowest overall)
+-->to see some examples of data analysis look in the BMH_data_analysis files
 
+--> (1)CovMapCellsBMH -- takes image series from microscope, finds cells in each image
+	(2)trackIDL_BMH replaces AlignCellsIMCT -- takes cell list from CovMapCell, constructs full cell traces
+-also see aligncell, aligncellsIM, aligncellsKmeans (all functional but some tradeoffs, IMCT is probably the best although slowest overall)
 
-		
-Contact JSO if problems occur (JacobStewartOrnstein@gmail.com)
+Contact BMH if problems occur (heineike02@gmail.com)
+Original version (1.0) created by JSO (JacobStewartOrnstein@gmail.com)
 
-Git notes: repository ignores any image files (eg background images) to get those look at the orignal files on the FTP server under Resources/script
+archive contains version 1.0 files that were not replaced in new version, but which were not necessary
+
+Git notes: repository ignores any image files (eg background images) to get those look at the original files on the FTP server under Resources/script
 this is after v1.0

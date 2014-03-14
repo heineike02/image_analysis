@@ -1,5 +1,7 @@
 function [maxx,maxy]=FindMaximaBMH(im,pointx,pointy,dis)
 
+maxx = [];
+maxy = [];
 %sets margin of 10 around border of image, filters out points within edge
 %boundaries
 edge=10;
