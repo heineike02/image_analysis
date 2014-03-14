@@ -12,3 +12,4 @@ JSO code for microscope control as of 12/12/12
 Contact JSO if problems occur (JacobStewartOrnstein@gmail.com)
 
 Git notes: repository ignores any image files (eg background images) to get those look at the orignal files on the FTP server under Resources/script
+this is after v1.0
