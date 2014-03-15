@@ -14,6 +14,6 @@ Original version (1.0) created by JSO (JacobStewartOrnstein@gmail.com)
 
 archive contains version 1.0 files that were not replaced in new version, but which were not necessary
 
-use BMH_data_analysis/BMH_20130716_analysis_klac.m as an example (has updated file structure).
+use BMH_data_analysis/BMH_20140304_analysis_KL_vs_SC.m as an example (has updated file structure).
 
 Git notes: repository ignores any image files (eg background images) to get those look at the original files on the FTP server under Resources/script

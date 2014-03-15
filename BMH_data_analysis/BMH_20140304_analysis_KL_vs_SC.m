@@ -15,7 +15,7 @@ profile on
 
 %load image - first image is S. Cerevisiae pre-induction
 %Windows: 
-ipdir = 'C:\Users\Ben\Google Drive\UCSF\ElSamad_Lab\PKA\Image_analysis\Image_processing_scripts\BMH_Image_Analysis\'
+ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
 
 %Mac
 %ex: imdir = '/Users/ucsf/Google Drive/UCSF/ElSamad_Lab/PKA/WetLab/20130716/Gluc_pre_ind/Pos1/'
