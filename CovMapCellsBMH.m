@@ -1,5 +1,4 @@
-function timecoursedata =CovMapCellsBMH20130716(di,images, channels, circ, images_bf, imbg , siz , storeim, rad, std_thresh, times)
-
+function timecoursedata =CovMapCellsBMH(imdir,images, channels, circ, imbg , siz , storeim, rad, std_thresh, times)
 %function which finds cells in a  given image
 %di = folder containing .tif images (string), 
 %images = list of image filenames to use in the form of a cell with N string entries.
@@ -22,25 +21,49 @@ function timecoursedata =CovMapCellsBMH20130716(di,images, channels, circ, image
 %
 %adds JSO image processing files to path
 %Windows
-path(path,'C:\Users\Ben\Google Drive\HES_Lab_Share\Scripts\JSO_Image_Analysis');
+%path(path,'C:\Users\Ben\Google Drive\HES_Lab_Share\Scripts\JSO_Image_Analysis');
 
-N = length(images);
+%N = length(images.(channels{1}));
+N = length({images.(channels{1})});
 if N ~= length(times)
     'Error - times not the same size as number of images'
     return
 end
-    
+
+Nchan = length(channels);
+
+kk = 1; 
+for jj = 1:Nchan
+    if strfind(channels{jj}, 'BF')>0
+        'Bright Field images will be used'
+        bf_flag = 1;
+    else 
+        bf_flag = 0;
+        channels_epi{kk} = channels{jj};
+        kk = kk + 1;
+    end
+end
+
+
+
 timecoursedata = struct('name','','celldata',[],'time',0);
-timecoursedata(1:N) = timecoursedata(1);
+timecoursedata(1:N,1:(Nchan-bf_flag)) = timecoursedata(1);
 
 for jj = 1:N
-    [int2str(jj), ' of ', int2str(N)]
-    im = imread([di,images{jj}]);
-    bf_mask = imread([di,images_bf{jj}]);
-    celldata = FindCellsBMH(im, circ, bf_mask , imbg , siz, storeim, rad, std_thresh);
-    timecoursedata(jj).name = images{jj};
-    timecoursedata(jj).celldata = celldata;
-    timecoursedata(jj).time = times(jj);
+    for kk = 1:(Nchan - bf_flag)
+        imnames = {images.(channels_epi{kk})};
+        imname = imnames(jj);
+        strcat(int2str(jj), {' of '}, int2str(N), {' Channel = '}, channels_epi{kk}, {' '}, imname  )
+        im = imread(char(strcat(imdir,imname)));
+        if bf_flag == 1
+            bf_mask = imread(char(strcat(imdir,images.BF{jj})));
+        else
+            bf_mask = [];
+        end
+        celldata = FindCellsBMH(im, circ, bf_mask , imbg , siz, storeim, rad, std_thresh);
+        timecoursedata(jj,kk).name = imname;
+        timecoursedata(jj,kk).celldata = celldata;
+        timecoursedata(jj,kk).time = times(jj);
 end
 
 
