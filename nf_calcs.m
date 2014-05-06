@@ -1,5 +1,3 @@
-
-
 function [mean_nf, std_nf] = nf_calcs(times,tracks)
 nTimes = length(times);
 nTracks = length(tracks);

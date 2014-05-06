@@ -1,4 +1,4 @@
-function all_tracks = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species_cell,phases, shift_spacing,imdirPhase, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,dt,imbg,summary_title,acolor_summary)
+function [all_tracks, all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species_cell,phases, shift_spacing,imdirPhase, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,dt,imbg)
 % Code for quantifying KL or SC nuclear localization using 1x or 1.5x
 % optical zoom.  
 % Change jacobs image code output to sort in image order. 
@@ -28,7 +28,7 @@ if strcmp(op_amp,'1x')
     load([ipdir, 'circKL_1x.mat'])
     circSP.KL = circ;
     %load image of S.Cerevisiae cell (made by Jacob)
-    load([ipdir(1:end-19),'circSC_1x.mat'])
+    load([ipdir,'circSC_1x.mat'])
     circSP.SC = circ;
     
     %Size of image of individual cell to analyze
@@ -159,57 +159,33 @@ if strcmp(fname_conv,'JSO')
             
             t = times(end);
             
-            all_tracks = [];
+            all_tracks.(phase) = [];
             for nn = 1:length(tracks_vec)
-                all_tracks = [all_tracks,tracks_vec(nn).tracks];
+                all_tracks.(phase) = [all_tracks.(phase),tracks_vec(nn).tracks];
             end
-            
-            [mean_nf, std_nf] = nf_calcs(times,all_tracks);
-            
-            figure(9)
-            hold on;
-            alpha = 0.2;
-            fill([times fliplr(times)],[mean_nf'+std_nf' fliplr(mean_nf'-std_nf')],acolor_summary, 'FaceAlpha', alpha,'linestyle','none');
-            plot(times,mean_nf,acolor_summary,'linewidth',1.5); % change color or linewidth to adjust mean line
-            xlabel('time(min)')
-            ylabel('Mean Nuclear Localization')
-            title(summary_title)
-            
-            figure(7)
-            hold all
-            for nn = 1:length(all_tracks)
-               nf_vec = [all_tracks(nn).nf];
-               t_vec = [all_tracks(nn).times];
-               plot(t_vec,nf_vec)
-            end
-            xlabel('time(min)')
-            ylabel('Nuclear Localization')
-            title(summary_title)
-            
+            all_times.(phase) = times
+                        
         end
 
 
     end
 
 
-    figure(1)
-    suptitle('Cell Tracks')     
-    figure(2)
-    suptitle('Nuclear Localization in response to Glucose loss')        
-    figure(3)
-    suptitle('Mean Nuclear Localization in response to Glucose loss')
+    %figure(1)
+    %suptitle('Cell Tracks')     
+    %figure(2)
+    %suptitle('Nuclear Localization in response to Glucose loss')        
+    %figure(3)
+    %suptitle('Mean Nuclear Localization in response to Glucose loss')
         
 
 elseif strcmp(fname_conv,'Micromanager')
 
-
 %See earlier date files to see how to manage data with Micromanager file
 %naming conventions
 
-profile off
-
-
 end
 
+profile off
 end
 
