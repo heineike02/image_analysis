@@ -39,7 +39,7 @@ imdirPhase.Post = [base_dir,'TM_doseresp_post\']
 %input information from experiment here
 species_cell = {'SC'} %{'SC'}  %
 phases =  {'Pre','Post'} %,'Post'} 
-shift_spacing = [0,4]
+shift_spacing = [0,4]    
 
 channels = {'BF','RFP','YFP'}
 channel_to_image = 'RFP'
@@ -110,36 +110,78 @@ posvec = {'p1','p2','p3';
 'p19','p20','p21';
 'p22','p23','p24'};
 
+%Obtain and store data for each dose (note: only need to do this once) 
+
+get_data = 0
+
+all_tracks_vec = [];
+all_times_vec = [];
+if get_data == 1 
+    for jj = 1:length(dosevec)
+       pos_fnamesSP.SC = posvec(jj,:)   %{'p16','p17','p18'} %, 'p14','p15'}
+       [all_tracks,all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species_cell,phases, shift_spacing,imdirPhase, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,dt,imbg)
+       all_tracks_vec{jj} = all_tracks;
+       all_times_vec{jj} = all_times;
+    end
+    %store data
+    save([base_dir,'TM_doseresp_processed_data.mat'],'all_times_vec','all_tracks_vec','dosevec','posvec')
+else
+    %retreive data
+    load([base_dir,'TM_doseresp_processed_data.mat'],'all_times_vec','all_tracks_vec','dosevec','posvec')   
+end
+
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder
 cmap = cool(length(dosevec));
-
-figure(1)
-clf 
-hold on
-for jj = 1:length(dosevec)
-    pos_fnamesSP.SC = posvec(jj,:)   %{'p16','p17','p18'} %, 'p14','p15'}
-    [all_tracks,all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species_cell,phases, shift_spacing,imdirPhase, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,dt,imbg)
-    color_val = cmap(jj,:);
-    plt_grp(jj) = hggroup;
-    for ph = 1: length(phases)
-        tracks = all_tracks.(phases{ph});
-        times = all_times.(phases{ph});
-        p = plot_meanvalues(times,tracks,color_val,0);
-        set(p,'Parent',plt_grp(jj))
-    end
-end
 
 %convert dosevec to string
 for jj = 1: length(dosevec)
     dosevec_str{jj} = num2str(dosevec(jj),'%0.2f')
 end
-hleg = legend(plt_grp,dosevec_str,'Location','NE');
+
+figure(1)
+clf 
+hold on
+for jj = 1:length(dosevec)
+    all_tracks = all_tracks_vec{jj};
+    all_times = all_times_vec{jj};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        times = all_times.(phases{ph});
+        p = plot_meanvalues(times,tracks,color_val,0,'nf');
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+
+
+hleg = legend(plt_grp,dosevec_str) %,'Location','NE');
 htitle = get(hleg,'Title');
 set(htitle,'String','Tm (ug/ml)')
-
 title('MSN2 Nuclear Localization after Tm treatment')
 
 
+figure(2)
+clf 
+hold on
+for jj = 1:length(dosevec)
+    all_tracks = all_tracks_vec{jj};
+    all_times = all_times_vec{jj};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        times = all_times.(phases{ph});
+        p = plot_meanvalues(times,tracks,color_val,0,'nmi');
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+hleg = legend(plt_grp,dosevec_str) %,'Location','NE');
+htitle = get(hleg,'Title');
+set(htitle,'String','Tm (ug/ml)')
+title('Median intensity after Tm treatment')
 
 
 end
