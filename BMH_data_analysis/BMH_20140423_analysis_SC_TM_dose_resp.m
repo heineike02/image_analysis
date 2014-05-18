@@ -1,4 +1,4 @@
-function all_tracks = BMH_20140423_analysis_KL_vs_SC()
+function all_tracks = BMH_20140423_analysis_SC_TM_dose_resp()
 %Separate plotting from data collection
 %Save data in between data collection
 %Plot median intensity
@@ -6,7 +6,7 @@ function all_tracks = BMH_20140423_analysis_KL_vs_SC()
 %Spot cells with bright field
 %Collect Cell Size
 
-
+%pos25 - difficult combinatorics - check it.  
 
 % Need to have argument for channel to measure / output
 % Change jacobs image code output to sort in image order. 
@@ -36,15 +36,28 @@ imdirPhase.Post = [base_dir,'TM_doseresp_post\']
 
 %line: 37 KL.BGLII , doubledash, 38: KL.COXI, dots: 39: ag.TEF1
 
+
 %input information from experiment here
-species_cell = {'SC'} %{'SC'}  %
-phases =  {'Pre','Post'} %,'Post'} 
-shift_spacing = [0,4]    
+species = 'SC' %{'SC'}  %
 
 channels = {'BF','RFP','YFP'}
 channel_to_image = 'RFP'
 
-dt = 4
+phases =  {'Pre','Post'} %,'Post'}  
+shift_spacing = [0,12]    
+
+%timestep method
+%time_calc:  Tells the program how to calculate each time value.  If the
+%input is a number then that is interpreted as a dt between images
+%If the input is a filename, then that is interpreted as metadata that gives
+%exact time values.  
+
+%time_calc_phase.Pre = 4
+%time_calc_phase.Post = 4
+time_calc_phase.Pre = [base_dir,'TM_doseresp_pre\acqdat.txt']
+time_calc_phase.Post = [base_dir,'TM_doseresp_post\acqdat.txt']
+
+
 %std thresh for calling a peak to find a cell
 %0.16 seemed to work best for k.lactis on 16JUL images
 std_threshSP.KL = 0.16;
@@ -98,6 +111,11 @@ end
 %Pos 31-33: 11-38 NACL 0.25M
 
 dosevec = [0.00,0.078125,0.15625,0.3125,0.625,1.25,2.50,5.00];
+%convert dosevec to string
+for jj = 1: length(dosevec)
+    dosevec_str{jj} = num2str(dosevec(jj),'%0.2f');
+end
+legend_str = [dosevec_str,'HSP12','UPRE4x','NaCl 0.25M'];
 
 %Micromanager positions: Pos0, Pos1, etc.  
 %JSO positions p1,p2,etc
@@ -108,7 +126,10 @@ posvec = {'p1','p2','p3';
 'p13','p14','p15';
 'p16','p17','p18';
 'p19','p20','p21';
-'p22','p23','p24'};
+'p22','p23','p24';
+'p25','p26','p27';
+'p28','p29','p30';
+'p31','p32','p33'};
 
 %Obtain and store data for each dose (note: only need to do this once) 
 
@@ -117,9 +138,23 @@ get_data = 0
 all_tracks_vec = [];
 all_times_vec = [];
 if get_data == 1 
-    for jj = 1:length(dosevec)
-       pos_fnamesSP.SC = posvec(jj,:)   %{'p16','p17','p18'} %, 'p14','p15'}
-       [all_tracks,all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species_cell,phases, shift_spacing,imdirPhase, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,dt,imbg)
+    for jj = 1:length(posvec)
+       if (jj==9)||(jj==10)  %UPRE and HSP12 controls
+          channel_to_image = 'YFP' 
+       else 
+          channel_to_image = 'RFP'
+       end
+       
+       for ph = 1:length(phases);
+           phase = phases{ph};
+           imdir = imdirPhase.(phase);
+           shift_spacing_ph = shift_spacing(ph);
+           time_calc = time_calc_phase.(phase);
+           pos_fnamesSP.SC = posvec(jj,:)   %{'p16','p17','p18'} %, 'p14','p15'}
+           [tracks,times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species,imdir, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,time_calc,imbg);
+           all_tracks.(phase) = tracks;
+           all_times.(phase) = times + shift_spacing(ph);
+       end
        all_tracks_vec{jj} = all_tracks;
        all_times_vec{jj} = all_times;
     end
@@ -132,16 +167,12 @@ end
 
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder
 cmap = cool(length(dosevec));
-
-%convert dosevec to string
-for jj = 1: length(dosevec)
-    dosevec_str{jj} = num2str(dosevec(jj),'%0.2f')
-end
+cmap = [cmap;[1,0,0];[1,0.5,0];[0,0,0]]; %add colors for controls
 
 figure(1)
 clf 
 hold on
-for jj = 1:length(dosevec)
+for jj = 1:length(posvec)
     all_tracks = all_tracks_vec{jj};
     all_times = all_times_vec{jj};
     color_val = cmap(jj,:);
@@ -156,7 +187,7 @@ end
 
 
 
-hleg = legend(plt_grp,dosevec_str) %,'Location','NE');
+hleg = legend(plt_grp,legend_str); %,'Location','NE');
 htitle = get(hleg,'Title');
 set(htitle,'String','Tm (ug/ml)')
 title('MSN2 Nuclear Localization after Tm treatment')
@@ -165,7 +196,7 @@ title('MSN2 Nuclear Localization after Tm treatment')
 figure(2)
 clf 
 hold on
-for jj = 1:length(dosevec)
+for jj = 1:length(posvec)
     all_tracks = all_tracks_vec{jj};
     all_times = all_times_vec{jj};
     color_val = cmap(jj,:);
@@ -178,11 +209,31 @@ for jj = 1:length(dosevec)
     end
 end
 
-hleg = legend(plt_grp,dosevec_str) %,'Location','NE');
+hleg = legend(plt_grp,legend_str); %,'Location','NE');
 htitle = get(hleg,'Title');
 set(htitle,'String','Tm (ug/ml)')
 title('Median intensity after Tm treatment')
 
+figure(3)
+clf 
+hold on
+for jj = 1:length(posvec)
+    all_tracks = all_tracks_vec{jj};
+    all_times = all_times_vec{jj};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        times = all_times.(phases{ph});
+        p = plot_ncells(times,tracks,color_val);
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+hleg = legend(plt_grp,legend_str); %,'Location','NE');
+htitle = get(hleg,'Title');
+set(htitle,'String','Tm (ug/ml)')
+title('Number of cells identified')
 
 end
 

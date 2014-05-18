@@ -1,10 +1,15 @@
-function [all_tracks, all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species_cell,phases, shift_spacing,imdirPhase, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,dt,imbg)
+function [all_tracks, all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species,imdir, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,time_calc,imbg)
 % Code for quantifying KL or SC nuclear localization using 1x or 1.5x
 % optical zoom.  
 % Change jacobs image code output to sort in image order. 
 % Too many tracks - something wierd going on
 % Had to use ".tiff" for several images
 % Note: to make training image use ginput function
+
+%time_calc:  Tells the program how to calculate each time value.  If the
+%input is a number, then that is interpreted as a dt between images.  If
+%the input is a filename, then that is interpreted as metadata that gives
+%exact time values.  
 
 profile on
 %ipdir: directory for image processing
@@ -38,7 +43,7 @@ if strcmp(op_amp,'1x')
     radSP.KL = 4;
     radSP.SC = 6;    
     
-    multiplier = 1.0
+    multiplier = 1.0;
     
 elseif strcmp(op_amp,'1.5x')
     %load image of KLactis cell - this was made in BMH_20130916_analysis_klac.m
@@ -67,109 +72,92 @@ end
 %estimated maximum number of tracks
 maxdisp = maxdisp_1x * multiplier;
 
-Nchan = length(channels)
+Nchan = length(channels);
 
 if strcmp(fname_conv,'JSO')
 
-    
-    for sp = 1:length(species_cell)
-        species = species_cell{sp};
-        siz = sizSP.(species);
-        rad = radSP.(species);
-        circ = circSP.(species);
-        std_thresh = std_threshSP.(species);
-        pos_fnames = pos_fnamesSP.(species);
-        positions = length(pos_fnames)
+    siz = sizSP.(species);
+    rad = radSP.(species);
+    circ = circSP.(species);
+    std_thresh = std_threshSP.(species);
+    pos_fnames = pos_fnamesSP.(species);
+    positions = length(pos_fnames);
+
+    for nn = 1:positions
+        pos_fnames_nn = pos_fnames(nn);
+        [tracks, times, images] = cell_track_data(imdir,channel_to_image,pos_fnames_nn,Nchan,circ,imbg,siz,storeim,rad,std_thresh,maxdisp,time_calc);
         
-        t = 0
-        for ph = 1:length(phases);
-            phase = phases{ph};
-            shift_spacing_ph = shift_spacing(ph);
-            imdir = imdirPhase.(phase);
-            
-            for nn = 1:positions
-                pos_fnames_nn = pos_fnames(nn);
-                [tracks, times, images] = cell_track_data(imdir,channel_to_image,pos_fnames_nn,Nchan,shift_spacing_ph,dt,circ,imbg,siz,storeim,rad,std_thresh,maxdisp,t);
-                nTimes = length(times);
-                
-                %store data
-                tracks_vec(nn).tracks = tracks;
-                
-                %Starting point if you just want graphs
-                %tracks = tracks_vec(nn).tracks;
+        %store data
+        tracks_vec(nn).tracks = tracks;
 
-                plot_each_pos = 0;
-                
-                if plot_each_pos == 1
-                    nTracks = length(tracks);
-                    figure(1)  
-                    im = imread([imdir,images(1).(channel_to_image)]); 
-                    %subplot(2,2,nn)
-                    hold all
-                    imagesc(im)
-                    %imshow(im);
+        %Starting point if you just want graphs
+        %tracks = tracks_vec(nn).tracks;
 
-                    for jj = 1:nTracks
-                        x_vec = [tracks(jj).Cxloc];
-                        y_vec = [tracks(jj).Cyloc];
-                        %imagesc seems to flip the axes
-                        plot(y_vec,x_vec,'LineWidth',3)
-                    end
+        plot_each_pos = 0;
 
-                    [mean_nf, std_nf] = nf_calcs(times,tracks)
+        if plot_each_pos == 1
+            nTracks = length(tracks);
+            figure(1)  
+            im = imread([imdir,images(1).(channel_to_image)]); 
+            %subplot(2,2,nn)
+            hold all
+            imagesc(im)
+            %imshow(im);
 
-                    figure(2)
-                    %subplot(2,2,nn)
-                    hold all
-                    for jj = 1:nTracks
-                        nf_vec = [tracks(jj).nf];
-                        t_vec = [tracks(jj).times];
-                        plot(t_vec,nf_vec)
-                    end
-
-                    
-                    
-
-                    plot(times,mean_nf, 'k','LineWidth', 3)
-                    xlabel('time (m)')
-                    ylabel('Nuclear Localization')
-                    axis([0,110,1.0,5])
-
-
-                    figure(3)
-                    %subplot(2,2,nn)
-                    hold on
-                    errorbar(times,mean_nf,std_nf)
-                    xlabel('time (m)')
-                    ylabel('Nuclear Localization')
-                    axis([0,50,1.0,5])
-
-                    figure(4)
-                    hold on;
-                    alpha = 0.2;
-                    acolor = 'c';
-                    fill([times fliplr(times)],[mean_nf'+std_nf' fliplr(mean_nf'-std_nf')],acolor, 'FaceAlpha', alpha,'linestyle','none');
-                    plot(times,mean_nf,acolor,'linewidth',1.5); % change color or linewidth to adjust mean line
-
-                end
-                
-                
-                
+            for jj = 1:nTracks
+                x_vec = [tracks(jj).Cxloc];
+                y_vec = [tracks(jj).Cyloc];
+                %imagesc seems to flip the axes
+                plot(y_vec,x_vec,'LineWidth',3)
             end
-            
-            t = times(end);
-            
-            all_tracks.(phase) = [];
-            for nn = 1:length(tracks_vec)
-                all_tracks.(phase) = [all_tracks.(phase),tracks_vec(nn).tracks];
+
+            [mean_nf, std_nf] = nf_calcs(times,tracks)
+
+            figure(2)
+            %subplot(2,2,nn)
+            hold all
+            for jj = 1:nTracks
+                nf_vec = [tracks(jj).nf];
+                t_vec = [tracks(jj).times];
+                plot(t_vec,nf_vec)
             end
-            all_times.(phase) = times
-                        
+
+
+
+
+            plot(times,mean_nf, 'k','LineWidth', 3)
+            xlabel('time (m)')
+            ylabel('Nuclear Localization')
+            axis([0,110,1.0,5])
+
+
+            figure(3)
+            %subplot(2,2,nn)
+            hold on
+            errorbar(times,mean_nf,std_nf)
+            xlabel('time (m)')
+            ylabel('Nuclear Localization')
+            axis([0,50,1.0,5])
+
+            figure(4)
+            hold on;
+            alpha = 0.2;
+            acolor = 'c';
+            fill([times fliplr(times)],[mean_nf'+std_nf' fliplr(mean_nf'-std_nf')],acolor, 'FaceAlpha', alpha,'linestyle','none');
+            plot(times,mean_nf,acolor,'linewidth',1.5); % change color or linewidth to adjust mean line
+
         end
-
 
     end
 
+    all_tracks = [];
+    for nn = 1:length(tracks_vec)
+        all_tracks = [all_tracks,tracks_vec(nn).tracks];
+    end
+    %right now not averaging time when multiple photos taken - just taking
+    %last time.  
+    all_times = times;
+    
 
     %figure(1)
     %suptitle('Cell Tracks')     

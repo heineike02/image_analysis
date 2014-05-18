@@ -1,9 +1,10 @@
 function fig_out = plot_meanvalues(times,tracks,color_val,std_flag,val_to_plot)
 
+times_ind = 1:length(times);
 if strcmp(val_to_plot,'nf')
-    [mean_val, std_val] = nf_calcs(times,tracks);
+    [mean_val, std_val] = nf_calcs(times_ind,tracks);
 elseif strcmp(val_to_plot,'nmi')
-    [mean_val, std_val] = nmi_calcs(times,tracks);
+    [mean_val, std_val] = nmi_calcs(times_ind,tracks);
 end
 
 %if std_flag = 1, plot std, otherwise, just plot mean
