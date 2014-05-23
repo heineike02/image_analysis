@@ -40,6 +40,15 @@ end
 %Get rid of additional zeros at the end of the vector
 xyzs = xyzs(sum(xyzs,2)>0,:);
 
+%plot xy positions
+% figure(1)
+% clf
+% hold on
+% colorvec = jet(length(times));
+% for jj = 1:length(times)
+%     xy = xyzs(xyzs(:,5)==jj,[1,2]);
+%     plot(xy(:,1),xy(:,2),'Marker','x','LineStyle','none','Color',colorvec(jj,:))
+% end
 
 track_raw = track(xyzs,maxdisp,param);
 track_inds = track_raw(:,end);

@@ -1,12 +1,7 @@
 function all_tracks = BMH_20140423_analysis_SC_TM_dose_resp()
-%Separate plotting from data collection
-%Save data in between data collection
-%Plot median intensity
-%Plot number of cells
-%Spot cells with bright field
-%Collect Cell Size
-
 %pos25 - difficult combinatorics - check it.  
+%Also didn't use background image - should run again to improve data.
+%Jacobs images are a reflection of the way micromanager saves images.
 
 % Need to have argument for channel to measure / output
 % Change jacobs image code output to sort in image order. 
@@ -34,8 +29,6 @@ imdirPhase.Pre = [base_dir,'TM_doseresp_pre\']
 imdirPhase.Post = [base_dir,'TM_doseresp_post\']
 %imdirPhase.Rep = [base_dir,'Gluc_Rep_Post\']
 
-%line: 37 KL.BGLII , doubledash, 38: KL.COXI, dots: 39: ag.TEF1
-
 
 %input information from experiment here
 species = 'SC' %{'SC'}  %
@@ -43,7 +36,7 @@ species = 'SC' %{'SC'}  %
 channels = {'BF','RFP','YFP'}
 channel_to_image = 'RFP'
 
-phases =  {'Pre','Post'} %,'Post'}  
+phases =  {'Pre'} %,'Post'} %,'Post'}  
 shift_spacing = [0,12]    
 
 %timestep method
@@ -54,9 +47,8 @@ shift_spacing = [0,12]
 
 %time_calc_phase.Pre = 4
 %time_calc_phase.Post = 4
-time_calc_phase.Pre = [base_dir,'TM_doseresp_pre\acqdat.txt']
-time_calc_phase.Post = [base_dir,'TM_doseresp_post\acqdat.txt']
-
+time_calc_phase.Pre = [imdirPhase.Pre, 'acqdat.txt']
+time_calc_phase.Post = [imdirPhase.Post, 'acqdat.txt']
 
 %std thresh for calling a peak to find a cell
 %0.16 seemed to work best for k.lactis on 16JUL images
@@ -72,7 +64,7 @@ maxdisp_1x = 4;
 op_amp =  '1x'
 storeim = 1;
 
-bgimg = 0; 
+bgimg = 1; 
 %1 if you have a background image, 0 if you don't. 
 %Gets background image depending on channel to image
 %Collect background images using micromanager 
@@ -81,7 +73,8 @@ if bgimg == 0
 else
     %imbg = imread([base_dir,'BG\',channel_to_image,'_p1.tiff']);
     if strcmp(channel_to_image,'RFP')
-         imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\RFP_BG\img_000000000_Default_000.tiff');
+         imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\RFP_BG\img_000000000_Default_000.tif');
+         imbg = imbg';
     elseif strcmp(channel_to_image,'YFP')
          imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\YFP_BG\img_000000000_Default_000.tiff');
     else
@@ -159,10 +152,10 @@ if get_data == 1
        all_times_vec{jj} = all_times;
     end
     %store data
-    save([base_dir,'TM_doseresp_processed_data.mat'],'all_times_vec','all_tracks_vec','dosevec','posvec')
+    save([base_dir,'Pre_test.mat'],'all_times_vec','all_tracks_vec','dosevec','posvec')
 else
     %retreive data
-    load([base_dir,'TM_doseresp_processed_data.mat'],'all_times_vec','all_tracks_vec','dosevec','posvec')   
+    load([base_dir,'Pre_test.mat'],'all_times_vec','all_tracks_vec','dosevec','posvec')   
 end
 
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder

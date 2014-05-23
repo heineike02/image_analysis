@@ -1,17 +1,16 @@
-function all_tracks = BMH_20140430_analysis_sorb_dose_resp()
+function all_tracks = BMH_20140521_analysis_gluc_dose_resp()
 
-%For some reason RFP_cube p20 t6 was copied in my image files.  I deleted
-%one copy.
+%not all wells have the same number of time points - the scope failed 
+
+%to import an image sequence in imagej use regular expressions
+%eg. WellA05_Seq0000t[0-9]*xy1c1.*  WellD05_Seq[0-9]*t[0-9]*xy1c1.*
+%c1 is RFP
+
 
 %Spot cells with bright field
 %Collect Cell Size
 
-% Need to have argument for channel to measure / output
 % Change jacobs image code output to sort in image order. 
-% Too many tracks - something wierd going on
-
-% Had to use ".tiff" for several images
-% Note: to make training image use ginput function
 
 ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
 %adds image analysis directory to path based on directry of day's analysis
@@ -19,38 +18,45 @@ ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
 path(path,'..\..\image_analysis')
 
 % Filename convention
-% 'JSO' or 'Micromanager'
+% 'JSO','Micromanager', or 'HCS_Nikon'
 % For example of Micromanager filename convention see BMH_20140127 analysis
 % files
-fname_conv = 'JSO'
+fname_conv = 'Micromanager'
 
 %imdirPhase.Pre = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_pre_1\'
 %imdirPhase.Post = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_post_1\'
 
-base_dir = 'C:\Users\Ben\Box Sync\Data\PKA_Project\20140430\'
-imdirPhase.Pre = [base_dir,'sorb_dose_resp_pre\']
-imdirPhase.Post = [base_dir,'sorb_dose_resp_post\']
+base_dir = 'C:\Users\Ben\Box Sync\Data\PKA_Project\20140521_gluc_drop\'
+imdirPhase.Pre = [base_dir,'Pre\']
+imdirPhase.Post = [base_dir,'Post\']
 %imdirPhase.Rep = [base_dir,'Gluc_Rep_Post\']
 
 %input information from experiment here
-species = 'SC' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
+species = 'KL' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
+species_cell = {'SC','KL'}
 
-channels = {'BF','RFP_cube'}
-channel_to_image = 'RFP_cube'
+fname_saveSP.KL = 'gluc_drop_doseresp_procdata_KL.mat';
+fname_saveSP.SC = 'gluc_drop_doseresp_procdata_SC.mat';
+
+channels = {'BF','RFP'}
+channel_to_image = 'RFP'
 
 phases =  {'Pre','Post'} %,'Post'} 
-shift_spacing = [0,12]    
+shift_spacing = [0,14]    
 %timestep method
 %time_calc:  Tells the program how to calculate each time value.  If the
 %input is a number then that is interpreted as a dt between images
 %If the input is a filename, then that is interpreted as metadata that gives
 %exact time values.  
 
-%time_calc_phase.Pre = 4
+%time_calc_phase.Pre = 5
 %time_calc_phase.Post = 4
-time_calc_phase.Pre = [imdirPhase.Pre, 'acqdat.txt']
-time_calc_phase.Post = [imdirPhase.Post, 'acqdat.txt']
-
+%time_calc_phase.Pre = [imdirPhase.Pre, 'acqdat.txt']
+%time_calc_phase.Post = [imdirPhase.Post, 'acqdat.txt']
+%extract actual times from metadata in micromanager images
+addpath('C:/Users/Ben/Documents/GitHub/image_analysis/jsonlab');
+time_calc_phase.Pre  = 'metadata.txt'
+time_calc_phase.Post = 'metadata.txt'
 
 %std thresh for calling a peak to find a cell
 %0.16 seemed to work best for k.lactis on 16JUL images
@@ -66,7 +72,7 @@ maxdisp_1x = 4;
 op_amp =  '1.5x'
 storeim = 1;
 
-bgimg = 1; 
+bgimg = 0; 
 %1 if you have a background image, 0 if you don't. 
 %Gets background image depending on channel to image
 %Collect background images using micromanager 
@@ -74,8 +80,8 @@ if bgimg == 0
     imbg = 1 % default
 else
     %imbg = imread([base_dir,'BG\',channel_to_image,'_p1.tiff']);
-    if strcmp(channel_to_image,'RFP_cube')
-         imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140430\BG\RFP_cube_BG\img_000000000_Default_000.tif');
+    if strcmp(channel_to_image,'RFP')
+         imbg = imread([base_dir,'\BG\RFP_BG\img_000000000_RFP_000.tif']);
          imbg = imbg'; %Micromanager images are the transpose of images taken by the image collection scripts.
     elseif strcmp(channel_to_image,'YFP')
          %imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\YFP_BG\img_000000000_Default_000.tiff');
@@ -93,53 +99,75 @@ else
 end
 
 
-%Pos 1-3: SC 0.5 M Sorb
-%Pos 4-5: KL 0.5 M Sorb
-%Pos 6-8: SC 0.25 M Sorb
-%Pos 9-10: KL 0.25 M Sorb
-%Pos 11-13: SC 0.125 M Sorb
-%Pos 14-15: KL 0.125 M Sorb
-%Pos 16-18: SC 0.0625 M Sorb
-%Pos 19-20: KL 0.0625 M Sorb
-%Pos 21-23: SC 0.03125 M Sorb
-%Pos 24-25: KL 0.03125 M Sorb
-%Pos 26-28: SC Cont
-%Pos 29-30: KL Cont
+%A7 sites 1-4 SC 2% to 0.111M
+%A8 sites 1-4 KL 2% to 0.111M
+%B7 sites 1-4 SC 2% to 0.028M
+%B8 sites 1-4 KL 2% to 0.028M
+%C7 sites 1-4 SC 2% to 0.028M + Sorb
+%C8 sites 1-4 KL 2% to 0.028M + Sorb
+%D7 sites 1-4 SC 2% to 0.006M
+%D8 sites 1-4 KL 2% to 0.006M
+%E7 sites 1-4 SC 2% to 0.006M + Sorb
+%E8 sites 1-4 KL 2% to 0.006M + Sorb
+%F7 sites 1-4 KL 2% to no gluc
+%F8 sites 1-4 KL 2% to no gluc
+%G7 sites 1-4 KL 2% to no gluc 0.111M Sorb
+%G8 sites 1-4 KL 2% to no gluc 0.111M Sorb
+%H8 sites 1-4 KL 2% to 2%
 
-dosevec = [0.5,0.25,0.125,0.0625,0.03125,0];
+legend_vec = {'0.111M Gluc','0.028M Gluc' ,'0.028M Gluc, 0.083M Sorb', '0.006M Gluc', '0.006M Gluc, 0.105M Sorb', '0M Gluc','0M Gluc, 0.111M Sorb', 'SDC 2%'}
 
 %Micromanager positions: Pos0, Pos1, etc.  
 %JSO positions p1,p2,etc
-posvec.SC = {'p1','p2','p3';
-'p6','p7','p8';
-'p11','p12','p13';
-'p16','p17','p18';
-'p21','p22','p23';
-'p26','p27','p28'};
 
-posvec.KL = {'p4','p5';
-'p9','p10';
-'p14','p15';
-'p19','p20';
-'p24','p25';
-'p29','p30'};
+wellvecSP.SC = {'A7','B7','C7','D7','E7','F7','G7'};
+wellvecSP.KL = {'A8','B8','C8','D8','E8','F8','G8','H8'}
+Nsites = 4;
+
+for sp = 1:length(species_cell);
+    wellvec = wellvecSP.(species_cell{sp});
+    for jj = 1:length(wellvec);
+        for kk = 1:Nsites;
+            posvecSP.(species_cell{sp}){jj,kk} = [wellvec{jj},'-Site_',num2str(kk-1)];
+        end
+    end
+end
+
+%For some reason A7-Site_2 is bad, remove it from the list
+posvecSP.SC{1,3} = 'NA'
+
+% posvec.SC = {'A7_site1','p2','p3';
+% 'p6','p7','p8';
+% 'p11','p12','p13';
+% 'p16','p17','p18';
+% 'p21','p22','p23';
+% 'p26','p27','p28'};
+% 
+% posvec.KL = {'p4','p5';
+% 'p9','p10';
+% 'p14','p15';
+% 'p19','p20';
+% 'p24','p25';
+% 'p29','p30'};
 
 %Obtain and store data for each dose (note: only need to do this once) 
 
-get_data = 1;
+get_data = 0;
 
 all_tracks_vec = [];
 all_times_vec = [];
+posvec = posvecSP.(species);
 if get_data == 1 
-    for jj = 1:length(dosevec)
+    for jj = 1:length(legend_vec)
        for ph = 1:length(phases);
             phase = phases{ph};
             imdir = imdirPhase.(phase);
-            shift_spacing_ph = shift_spacing(ph);
             time_calc = time_calc_phase.(phase);
-            pos_fnamesSP.SC = posvec.SC(jj,:);   %{'p16','p17','p18'} %, 'p14','p15'}
-            pos_fnamesSP.KL = posvec.KL(jj,:);
-            [tracks,times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species, imdir, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,time_calc,imbg);
+            pos_fnames = posvec(jj,:);   %{'p16','p17','p18'} %, 'p14','p15'}
+            %remove bad positions (NAs)
+            pos_fnames = pos_fnames(~strcmp(pos_fnames,'NA'));
+            %this function should take a list of positions as an input
+            [tracks,times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species, imdir, maxdisp_1x,pos_fnames,channels,channel_to_image,time_calc,imbg);
             all_tracks.(phase) = tracks;
             all_times.(phase) = times + shift_spacing(ph);
        end
@@ -147,24 +175,20 @@ if get_data == 1
        all_times_vec{jj} = all_times;
     end
     %store data
-    save([base_dir,'sorb_doseresp_processed_data_SC.mat'],'all_times_vec','all_tracks_vec','dosevec','posvec')
+    save([base_dir,fname_saveSP.(species)],'all_times_vec','all_tracks_vec','posvec')
 else
     %retreive data
-    load([base_dir,'sorb_doseresp_processed_data_SC.mat'],'all_times_vec','all_tracks_vec','dosevec','posvec')   
+    load([base_dir,fname_saveSP.(species)],'all_times_vec','all_tracks_vec','posvec')   
 end
+
 
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder
-cmap = cool(length(dosevec));
-
-%convert dosevec to string
-for jj = 1: length(dosevec)
-    dosevec_str{jj} = num2str(dosevec(jj),'%0.2f');
-end
+cmap = cool(length(legend_vec));
 
 figure(1)
 clf 
 hold on
-for jj = 1:length(dosevec)
+for jj = 1:length(legend_vec)
     all_tracks = all_tracks_vec{jj};
     all_times = all_times_vec{jj};
     color_val = cmap(jj,:);
@@ -179,16 +203,16 @@ end
 
 
 
-hleg = legend(plt_grp,dosevec_str) %,'Location','NE');
+hleg = legend(plt_grp,legend_vec) %,'Location','NE');
 htitle = get(hleg,'Title');
 set(htitle,'String','Sorbitol (M)')
-title('SC: MSN2 Nuclear Localization after sorbitol treatment')
+title('KL MSN2 Nuclear Localization after sorbitol treatment')
 
 
 figure(2)
 clf 
 hold on
-for jj = 1:length(dosevec)
+for jj = 1:length(legend_vec)
     all_tracks = all_tracks_vec{jj};
     all_times = all_times_vec{jj};
     color_val = cmap(jj,:);
@@ -201,16 +225,16 @@ for jj = 1:length(dosevec)
     end
 end
 
-hleg = legend(plt_grp,dosevec_str) %,'Location','NE');
+hleg = legend(plt_grp,legend_vec) %,'Location','NE');
 htitle = get(hleg,'Title');
 set(htitle,'String','Sorbitol (M)')
-title('SC MSN2 median intensity')
+title('KL MSN2 median intensity')
 
 
 figure(3)
 clf 
 hold on
-for jj = 1:length(dosevec)
+for jj = 1:length(legend_vec)
     all_tracks = all_tracks_vec{jj};
     all_times = all_times_vec{jj};
     color_val = cmap(jj,:);
@@ -223,10 +247,10 @@ for jj = 1:length(dosevec)
     end
 end
 
-hleg = legend(plt_grp,dosevec_str); %,'Location','NE');
+hleg = legend(plt_grp,legend_vec); %,'Location','NE');
 htitle = get(hleg,'Title');
 set(htitle,'String','Sorbitol (M)')
-title('SC: Number of cells identified')
+title('KL Number of cells identified')
 
 
 end

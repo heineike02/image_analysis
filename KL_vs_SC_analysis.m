@@ -1,4 +1,4 @@
-function [all_tracks, all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species,imdir, maxdisp_1x,pos_fnamesSP,channels,channel_to_image,time_calc,imbg)
+function [all_tracks, all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species,imdir, maxdisp_1x,pos_fnames,channels,channel_to_image,time_calc,imbg)
 % Code for quantifying KL or SC nuclear localization using 1x or 1.5x
 % optical zoom.  
 % Change jacobs image code output to sort in image order. 
@@ -11,7 +11,7 @@ function [all_tracks, all_times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op
 %the input is a filename, then that is interpreted as metadata that gives
 %exact time values.  
 
-profile on
+%profile on
 %ipdir: directory for image processing
 %Windows: 
 
@@ -74,106 +74,105 @@ maxdisp = maxdisp_1x * multiplier;
 
 Nchan = length(channels);
 
-if strcmp(fname_conv,'JSO')
-
-    siz = sizSP.(species);
-    rad = radSP.(species);
-    circ = circSP.(species);
-    std_thresh = std_threshSP.(species);
-    pos_fnames = pos_fnamesSP.(species);
-    positions = length(pos_fnames);
-
-    for nn = 1:positions
-        pos_fnames_nn = pos_fnames(nn);
-        [tracks, times, images] = cell_track_data(imdir,channel_to_image,pos_fnames_nn,Nchan,circ,imbg,siz,storeim,rad,std_thresh,maxdisp,time_calc);
-        
-        %store data
-        tracks_vec(nn).tracks = tracks;
-
-        %Starting point if you just want graphs
-        %tracks = tracks_vec(nn).tracks;
-
-        plot_each_pos = 0;
-
-        if plot_each_pos == 1
-            nTracks = length(tracks);
-            figure(1)  
-            im = imread([imdir,images(1).(channel_to_image)]); 
-            %subplot(2,2,nn)
-            hold all
-            imagesc(im)
-            %imshow(im);
-
-            for jj = 1:nTracks
-                x_vec = [tracks(jj).Cxloc];
-                y_vec = [tracks(jj).Cyloc];
-                %imagesc seems to flip the axes
-                plot(y_vec,x_vec,'LineWidth',3)
-            end
-
-            [mean_nf, std_nf] = nf_calcs(times,tracks)
-
-            figure(2)
-            %subplot(2,2,nn)
-            hold all
-            for jj = 1:nTracks
-                nf_vec = [tracks(jj).nf];
-                t_vec = [tracks(jj).times];
-                plot(t_vec,nf_vec)
-            end
 
 
+siz = sizSP.(species);
+rad = radSP.(species);
+circ = circSP.(species);
+std_thresh = std_threshSP.(species);
+positions = length(pos_fnames);
 
+for nn = 1:positions
+    pos_fnames_nn = pos_fnames{nn};
 
-            plot(times,mean_nf, 'k','LineWidth', 3)
-            xlabel('time (m)')
-            ylabel('Nuclear Localization')
-            axis([0,110,1.0,5])
+    %get filenames and put them into a strucure
+    images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
 
+    %get times
+    [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
 
-            figure(3)
-            %subplot(2,2,nn)
-            hold on
-            errorbar(times,mean_nf,std_nf)
-            xlabel('time (m)')
-            ylabel('Nuclear Localization')
-            axis([0,50,1.0,5])
+    %get tracks
+    tracks = cell_track_data(imdir,images,time_inds,time_vals,channel_to_image,circ,imbg,siz,storeim,rad,std_thresh,maxdisp);
 
-            figure(4)
-            hold on;
-            alpha = 0.2;
-            acolor = 'c';
-            fill([times fliplr(times)],[mean_nf'+std_nf' fliplr(mean_nf'-std_nf')],acolor, 'FaceAlpha', alpha,'linestyle','none');
-            plot(times,mean_nf,acolor,'linewidth',1.5); % change color or linewidth to adjust mean line
+    %store data
+    tracks_vec(nn).tracks = tracks;
 
+    %Starting point if you just want graphs
+    %tracks = tracks_vec(nn).tracks;
+
+    plot_each_pos = 0;
+
+    if plot_each_pos == 1
+        nTracks = length(tracks);
+        figure(1)  
+        im = imread([imdir,images(1).(channel_to_image)]); 
+        %subplot(2,2,nn)
+        hold all
+        imagesc(im)
+        %imshow(im);
+
+        for jj = 1:nTracks
+            x_vec = [tracks(jj).Cxloc];
+            y_vec = [tracks(jj).Cyloc];
+            %imagesc seems to flip the axes
+            plot(y_vec,x_vec,'LineWidth',3)
         end
 
+        [mean_nf, std_nf] = nf_calcs(time_vals,tracks)
+
+        figure(2)
+        %subplot(2,2,nn)
+        hold all
+        for jj = 1:nTracks
+            nf_vec = [tracks(jj).nf];
+            t_vec = [tracks(jj).times];
+            plot(t_vec,nf_vec)
+        end
+
+
+
+
+        plot(time_vals,mean_nf, 'k','LineWidth', 3)
+        xlabel('time (m)')
+        ylabel('Nuclear Localization')
+        axis([0,110,1.0,5])
+
+
+        figure(3)
+        %subplot(2,2,nn)
+        hold on
+        errorbar(time_vals,mean_nf,std_nf)
+        xlabel('time (m)')
+        ylabel('Nuclear Localization')
+        axis([0,50,1.0,5])
+
+        figure(4)
+        hold on;
+        alpha = 0.2;
+        acolor = 'c';
+        fill([time_vals fliplr(time_vals)],[mean_nf'+std_nf' fliplr(mean_nf'-std_nf')],acolor, 'FaceAlpha', alpha,'linestyle','none');
+        plot(time_vals,mean_nf,acolor,'linewidth',1.5); % change color or linewidth to adjust mean line
+
     end
-
-    all_tracks = [];
-    for nn = 1:length(tracks_vec)
-        all_tracks = [all_tracks,tracks_vec(nn).tracks];
-    end
-    %right now not averaging time when multiple photos taken - just taking
-    %last time.  
-    all_times = times;
-    
-
-    %figure(1)
-    %suptitle('Cell Tracks')     
-    %figure(2)
-    %suptitle('Nuclear Localization in response to Glucose loss')        
-    %figure(3)
-    %suptitle('Mean Nuclear Localization in response to Glucose loss')
-        
-
-elseif strcmp(fname_conv,'Micromanager')
-
-%See earlier date files to see how to manage data with Micromanager file
-%naming conventions
 
 end
 
-profile off
+all_tracks = [];
+for nn = 1:length(tracks_vec)
+    all_tracks = [all_tracks,tracks_vec(nn).tracks];
+end
+%right now not averaging time when multiple photos taken - just taking
+%last time.  
+all_times = time_vals;
+
+
+%figure(1)
+%suptitle('Cell Tracks')     
+%figure(2)
+%suptitle('Nuclear Localization in response to Glucose loss')        
+%figure(3)
+%suptitle('Mean Nuclear Localization in response to Glucose loss')
+     
+%profile off
 end
 
