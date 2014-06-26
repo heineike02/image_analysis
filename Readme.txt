@@ -17,3 +17,12 @@ archive contains version 1.0 files that were not replaced in new version, but wh
 use BMH_data_analysis/BMH_20140304_analysis_KL_vs_SC.m as an example (has updated file structure).
 
 Git notes: repository ignores any image files (eg background images) to get those look at the original files on the FTP server under Resources/script
+
+Desired features to add: 
+Change image collectioncode output to sort in image order (01 v.s. 1 in filename), then adjust that within this structure. 
+
+Use bright field to find cells and collect cell size
+Spot cells with bright field
+Collect Cell Size
+
+Filter out cells outside of a certain size range

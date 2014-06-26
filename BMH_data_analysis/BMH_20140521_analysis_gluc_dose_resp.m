@@ -115,13 +115,24 @@ end
 %G8 sites 1-4 KL 2% to no gluc 0.111M Sorb
 %H8 sites 1-4 KL 2% to 2%
 
-legend_vec = {'0.111M Gluc','0.028M Gluc' ,'0.028M Gluc, 0.083M Sorb', '0.006M Gluc', '0.006M Gluc, 0.105M Sorb', '0M Gluc','0M Gluc, 0.111M Sorb', 'SDC 2%'}
+%legend_vec = {'0.111M Gluc','0.028M Gluc' ,'0.028M Gluc, 0.083M Sorb', '0.006M Gluc', '0.006M Gluc, 0.105M Sorb', '0M Gluc','0M Gluc, 0.111M Sorb', 'SDC 2%'}
+%legend_vec = {'0.111M Gluc','0.028M Gluc' ,'0.006M Gluc', '0M Gluc'};
+legend_vec = {'0.111M Gluc','0.028M Gluc' ,'0.028M Gluc, 0.083M Sorb', '0.006M Gluc', '0.006M Gluc, 0.105M Sorb', '0M Gluc','0M Gluc, 0.111M Sorb'}
 
 %Micromanager positions: Pos0, Pos1, etc.  
 %JSO positions p1,p2,etc
 
 wellvecSP.SC = {'A7','B7','C7','D7','E7','F7','G7'};
 wellvecSP.KL = {'A8','B8','C8','D8','E8','F8','G8','H8'}
+%wellvecSP.SC = {'A7','B7','D7','F7'};
+%plot_vec = [1,2,4,6]
+plot_vec = [1:8];
+%wellvecSP.KL = {'A8','B8','D8','F8'};
+%wellvecSP.SC = {'C7','E7','G7'};
+%wellvecSP.KL = {'C8','E8','G8'};
+
+
+
 Nsites = 4;
 
 for sp = 1:length(species_cell);
@@ -135,6 +146,7 @@ end
 
 %For some reason A7-Site_2 is bad, remove it from the list
 posvecSP.SC{1,3} = 'NA'
+
 
 % posvec.SC = {'A7_site1','p2','p3';
 % 'p6','p7','p8';
@@ -183,14 +195,16 @@ end
 
 
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder
-cmap = cool(length(legend_vec));
+%cmap = [0,0,0;1,0.5,0;1,0,0;0.5,0,0];
+cmap = [0,0,0;1,0.5,0;0,0,0.5;1,0,0;0,0,1;0.5,0,0;0,0.5,1];
+% cmap = cool(length(legend_vec));
 
 figure(1)
 clf 
 hold on
 for jj = 1:length(legend_vec)
-    all_tracks = all_tracks_vec{jj};
-    all_times = all_times_vec{jj};
+    all_tracks = all_tracks_vec{plot_vec(jj)};
+    all_times = all_times_vec{plot_vec(jj)};
     color_val = cmap(jj,:);
     plt_grp(jj) = hggroup;
     for ph = 1: length(phases)
@@ -205,8 +219,8 @@ end
 
 hleg = legend(plt_grp,legend_vec) %,'Location','NE');
 htitle = get(hleg,'Title');
-set(htitle,'String','Sorbitol (M)')
-title('KL MSN2 Nuclear Localization after sorbitol treatment')
+set(htitle,'String','Condition')
+title('KL MSN2 Nuclear Localization after Glucose Dropout')
 
 
 figure(2)
@@ -227,7 +241,7 @@ end
 
 hleg = legend(plt_grp,legend_vec) %,'Location','NE');
 htitle = get(hleg,'Title');
-set(htitle,'String','Sorbitol (M)')
+set(htitle,'String','Condition')
 title('KL MSN2 median intensity')
 
 
@@ -249,7 +263,7 @@ end
 
 hleg = legend(plt_grp,legend_vec); %,'Location','NE');
 htitle = get(hleg,'Title');
-set(htitle,'String','Sorbitol (M)')
+set(htitle,'String','Condition')
 title('KL Number of cells identified')
 
 
