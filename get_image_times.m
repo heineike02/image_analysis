@@ -30,40 +30,46 @@ elseif ischar(time_calc)
             time_vals(jj) = time;
        end
    elseif strcmp(fname_conv,'Micromanager')
-       %This routine assumes all metadata is in order - if it is out of
-       %order, we would have to check the filename
-       metadata = loadjson([imdir,pos_fnames_nn,'\',time_calc]);
-       %get starting time
-       tin = metadata.Summary.Time;
-       t0 = get_time(tin);
-           
-       field_names = fieldnames(metadata);
-       %Keep only fields that belong to images
-       field_names = field_names(~strcmp(field_names,'Summary'));
-       mm = 1;
-       for jj = 1:length(field_names)
-           if strcmp(metadata.(field_names{jj}).Channel,channel_to_image)
-               tin = metadata.(field_names{jj}).Time;
-               t1 = get_time(tin);
-               time = etime(t1,t0)/60; %gets elapsed time in minutes
-               time_vals(mm) = time;
-               mm = mm+1;
-           end
-       end
+       [~,Channel,~,Frame,Time] =  import_metadata_parsed([imdir,pos_fnames_nn,'\',time_calc])
+       chan_ind = strcmp(Channel,channel_to_image);
+       time_vals = Time(chan_ind);
+       
+       %%Old routine that uses Matlab's JSON parser - very slow!!!
+%        %This routine assumes all metadata is in order - if it is out of
+%        %order, we would have to check the filename
+%        metadata = loadjson([imdir,pos_fnames_nn,'\',time_calc]);
+%        %get starting time
+%        tin = metadata.Summary.Time;
+%        t0 = get_time(tin);
+%            
+%        field_names = fieldnames(metadata);
+%        %Keep only fields that belong to images
+%        field_names = field_names(~strcmp(field_names,'Summary'));
+%        mm = 1;
+%        for jj = 1:length(field_names)
+%            if strcmp(metadata.(field_names{jj}).Channel,channel_to_image)
+%                tin = metadata.(field_names{jj}).Time;
+%                t1 = get_time(tin);
+%                time = etime(t1,t0)/60; %gets elapsed time in minutes
+%                time_vals(mm) = time;
+%                mm = mm+1;
+%            end
+%        end
     end
 
 end
 
 end
 
-function tout = get_time(tin)
-    %converts time in micromanager metadata format to matlab format
-    t = zeros(1,6);
-    tout = regexp(tin,' ','split');
-    tout = tout{2};
-    tout = regexp(tout,':','split');
-    for jj = 1:3
-       t(jj+3) = str2double(tout{jj});
-    end
-    tout = t;
-end
+% function tout = get_time(tin)
+%     %converts time in micromanager metadata format to matlab format - now
+%     %done in python
+%     t = zeros(1,6);
+%     tout = regexp(tin,' ','split');
+%     tout = tout{2};
+%     tout = regexp(tout,':','split');
+%     for jj = 1:3
+%        t(jj+3) = str2double(tout{jj});
+%     end
+%     tout = t;
+% end

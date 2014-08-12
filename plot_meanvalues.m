@@ -1,4 +1,4 @@
-function fig_out = plot_meanvalues(times,tracks,color_val,std_flag,val_to_plot)
+function fig_out = plot_meanvalues(times,tracks,color_val,std_flag,val_to_plot,varargin)
 
 times_ind = 1:length(times);
 if strcmp(val_to_plot,'nf')
@@ -13,7 +13,7 @@ if std_flag == 1
     fill([times fliplr(times)],[mean_val'+std_val' fliplr(mean_val'-std_val')],color_val, 'FaceAlpha', alpha,'linestyle','none');
     hold on
 end
-fig_out = plot(times,mean_val,'Color',color_val,'linewidth',1.5); % change color or linewidth to adjust mean line
+fig_out = plot(times,mean_val,'Color',color_val,varargin{:}); % change color or linewidth to adjust mean line
   
 xlabel('time(min)')
 ylabel('Mean Nuclear Localization')

@@ -26,7 +26,6 @@ function timecoursedata =CovMapCellsBMH(imdir,images, channel, circ, imbg , siz 
 %path(path,'C:\Users\Ben\Google Drive\HES_Lab_Share\Scripts\JSO_Image_Analysis');
 
 %N = length(images.(channels{1}));
-a =1
 N = length({images.(channel)});
 if N ~= length(time_vals)
     'Error - times not the same size as number of images'
