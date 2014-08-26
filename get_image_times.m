@@ -4,7 +4,7 @@ function [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_im
 %the input is a filename, then that is interpreted as metadata that gives
 %exact time values.  
 
-nTimes = length(images);
+nTimes = length(images.(channel_to_image));
 time_inds = 1:nTimes;
 if isnumeric(time_calc)
    %method of calculating time is dt 

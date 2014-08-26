@@ -1,4 +1,4 @@
-function timecoursedata =CovMapCellsBMH(imdir,images, channel, circ, imbg , siz , storeim, rad, std_thresh, time_vals)
+function timecoursedata =CovMapCellsBMH_2color(imdir,images, channel, circ, imbg , siz , storeim, rad, std_thresh, time_vals)
 %function which finds cells in a  given image
 %di = folder containing .tif images (string), 
 %images = list of image filenames to use in the form of a cell with N string entries.
@@ -25,8 +25,14 @@ function timecoursedata =CovMapCellsBMH(imdir,images, channel, circ, imbg , siz 
 %Windows
 %path(path,'C:\Users\Ben\Google Drive\HES_Lab_Share\Scripts\JSO_Image_Analysis');
 
-%N = length(images.(channels{1}));
-N = length({images.(channel)});
+if iscell(channel) && (length(channel)==2) %matches spots for two colors
+    channels = channel;
+    N = length(images.(channels{1}));
+else
+    N = length(images.(channel));
+end
+
+%N = length({images.(channel)});
 if N ~= length(time_vals)
     'Error - times not the same size as number of images'
     return
@@ -47,28 +53,53 @@ end
 % end
 
 
+
 timecoursedata = struct('name','','celldata',[],'time',0);
 %timecoursedata(1:N,1:(Nchan-bf_flag)) = timecoursedata(1);
 timecoursedata(1:N,1) = timecoursedata(1);
 
 for jj = 1:N
-    imnames = {images.(channel)};
-    imname = imnames(jj);
-    strcat(int2str(jj), {' of '}, int2str(N), {' Channel = '}, channel, {' '}, imname  )
-    im = imread(char(strcat(imdir,imname)));
-%     if bf_flag == 1
-%         bf_mask = imread(char(strcat(imdir,images.BF{jj})));
-%    else
-    bf_mask = [];
-%    end
-    celldata = FindCellsBMH(im, circ, bf_mask , imbg , siz, storeim, rad, std_thresh);
-    %change this if I ever add another channel
-    kk = 1
-    timecoursedata(jj,kk).name = imname;
-    timecoursedata(jj,kk).celldata = celldata;
-    timecoursedata(jj,kk).time = time_vals(jj);
+    if iscell(channel) && (length(channel)==2)
+        for ch = 1:length(channels);
+            channel = channels{ch};
+            imnames = images.(channel);
+            imname = imnames(jj);
+            strcat(int2str(jj), {' of '}, int2str(N), {' Channel = '}, channel, {' '}, imname  )
+            im = imread(char(strcat(imdir,imname)));
+      %     if bf_flag == 1
+      %         bf_mask = imread(char(strcat(imdir,images.BF{jj})));
+      %     else
+            bf_mask = [];
+       %    end
+            celldataCH.(channel) = FindCellsBMH(im, circ, bf_mask , imbg , siz, storeim, rad, std_thresh);
+            %change this if I ever add another channel
+        end
+
+        %combine celldata from each channel into one
+        L = rad;
+        %celldata = match_two_channels(celldataCH.(channels{1}),channels{1},celldataCH.(channels{2}),channels{2},L);
+        %My algorithm breaks on 20140703 A11_site1.  
+        celldata = match_two_channels_Hung(celldataCH.(channels{1}),channels{1},celldataCH.(channels{2}),channels{2},L);
+
+    else
+       imnames = images.(channel);
+       imname = imnames(jj);
+       strcat(int2str(jj), {' of '}, int2str(N), {' Channel = '}, channel, {' '}, imname  )
+       im = imread(char(strcat(imdir,imname)));
+       %     if bf_flag == 1
+       %         bf_mask = imread(char(strcat(imdir,images.BF{jj})));
+       %    else
+       bf_mask = [];
+       %    end
+       celldata = FindCellsBMH(im, circ, bf_mask , imbg , siz, storeim, rad, std_thresh);
+
+    end
+
+    timecoursedata(jj).name = imname;
+    timecoursedata(jj).celldata = celldata;
+    timecoursedata(jj).time = time_vals(jj);
 end
 
-
 end
+
 

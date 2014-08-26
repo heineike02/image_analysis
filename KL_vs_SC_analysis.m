@@ -84,16 +84,43 @@ positions = length(pos_fnames);
 
 for nn = 1:positions
     pos_fnames_nn = pos_fnames{nn};
+    
+    if length(channel_to_image) == 2
+        channels_to_image = channel_to_image;
+        for ch = 1:length(channels_to_image)
+            channel_to_image = channels_to_image{ch};
+            %get filenames and put them into a strucure
+            images0 = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
+            
+            images.(channel_to_image) = images0.(channel_to_image);
+            %get times
+            [time_inds, time_valsCH.(channel_to_image)] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
+            %time_inds should be the same - time vals might be slightly
+            %different
+        end
 
-    %get filenames and put them into a strucure
-    images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
-
-    %get times
-    [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
-
+        %Make average time vals? 
+        time_vals = zeros(size(time_valsCH.(channels_to_image{1})));
+        for ch = 1:length(channels_to_image)
+            time_vals = time_vals + time_valsCH.(channels_to_image{ch});
+        end
+        time_vals = time_vals/length(channels_to_image);
+        
+    else 
+               
+        %get filenames and put them into a strucure
+        images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
+    
+        %get times
+        [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
+    
+    end
     %get tracks
     tracks = cell_track_data(imdir,images,time_inds,time_vals,channel_to_image,circ,imbg,siz,storeim,rad,std_thresh,maxdisp);
 
+    %add position information for each track
+    [tracks.pos] = deal(nn);
+    
     %store data
     tracks_vec(nn).tracks = tracks;
 

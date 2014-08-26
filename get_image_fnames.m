@@ -14,18 +14,22 @@ if strcmp(fname_conv,'JSO')
     channel_mod = mod(init_num,Nchan)+Nchan*(mod(init_num,Nchan)==0) ;
     %This is a pain because the numbering is not 01,02,03 and
     %messes up the ordering of the files. 
+    images_cell = cell(1,nTimes);
     for mm = 1:nTimes 
        fname = char(strcat(channel_to_image,'_',pos_fnames_nn,'_t',int2str(channel_mod+(mm-1)*Nchan),'.tiff'));
-       images(mm).(channel_to_image) = fname;
+       images_cell{mm} = fname;
     end
+    images.(channel_to_image) = images_cell;
 elseif strcmp(fname_conv,'Micromanager')
     images = struct();
     files=dir(strcat(imdir,pos_fnames_nn,'\*',channel_to_image,'*'));
     %images should be in the correct time order already
     nTimes = size(files,1);
+    images_cell = cell(1,nTimes);
     for mm = 1:nTimes
-        images(mm).(channel_to_image) = strcat(pos_fnames_nn,'\',files(mm).name);
+        images_cell{mm} = strcat(pos_fnames_nn,'\',files(mm).name);
     end
+    images.(channel_to_image) = images_cell;
 elseif strcmp(fname_conv,'HCS_Nikon')
 end
 

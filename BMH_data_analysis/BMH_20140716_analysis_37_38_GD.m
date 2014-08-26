@@ -114,6 +114,10 @@ end
 %F8 KL 39 GD  
 %G8 SC 37_1 SDC to SDC+0.5M Sorb
 
+%Note: First image after perturbation is at slightly different location
+%than second image - shifted about 1/3 of the size of the image.  Can trust
+%summary values but not cell tracks.  Should leave out of cell tracking
+
 %SC 
 legend_vec =   {'KL 39 GD'}; %{'37_1 GD','37_2 GD','38_1 GD','38_2 GD','11-38 GD','37_1 0.5M Sorb'}; % {'37_1 GD','37_2 GD','37_1 0.5M Sorb'}; %{'KL 39 GD'};
 %{'37_1 GD','37_2 GD','38_1 GD','38_2 GD','11-38 GD','37_1 0.5M Sorb'};

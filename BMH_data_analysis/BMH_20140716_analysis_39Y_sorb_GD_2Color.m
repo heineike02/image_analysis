@@ -1,4 +1,4 @@
-function all_tracks = BMH_20140703_analysis_39Y_sorb_GD()
+function all_tracks = BMH_20140716_analysis_39Y_sorb_GD_2Color()
 
 profile on
 ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
@@ -15,23 +15,23 @@ fname_conv = 'Micromanager'
 %imdirPhase.Pre = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_pre_1\'
 %imdirPhase.Post = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_post_1\'
 
-base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20140703_39y_GD_sorb_p5M\'
+base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20140716_37_38_GD\'
 imdirPhase.Pre = [base_dir,'Pre\']
 imdirPhase.Post = [base_dir,'Post\']
 %imdirPhase.Rep = [base_dir,'Gluc_Rep_Post\']
 
 %input information from experiment here
-species = 'KL' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
-species_cell = {'SC','KL'}
+species = 'SC' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
+species_cell = {'SC','KL'} 
 
 channels = {'BF','RFP','YFP'}
-channel_to_image = 'YFP'
+channels_to_image = {'RFP','YFP'}
 
-fname_saveSP.KL = ['20140703_processed_data_KL_',channel_to_image, '.mat'];
-fname_saveSP.SC = '20140703_processed_data_SC.mat';
+fname_saveSP.SC = '20140716_processed_data_SC_2color.mat';
+%fname_saveSP.SC = '20140703_processed_data_SC.mat'; 
 
 phases =  {'Pre','Post'} %,'Post'} 
-shift_timing = [0,10.5]    
+shift_timing = [0,8.66666]    
 %These are the absolute times at which each phase starts.
 %timestep method
 %time_calc:  Tells the program how to calculate each time value.  If the
@@ -105,22 +105,21 @@ else
     imbg = medfilt2(imbg,[coarse_smooth,coarse_smooth],'symmetric');
 end
 %all locations had 4 sites
-%A11 KL 39y1 SDC to SDC+0.5M Sorb
-%A12 KL 39y1 SC 2% to no gluc + 0.111M sorb
-%B11 KL 39y2 SDC to SDC+0.5M Sorb
-%B12 KL 39y2 SC 2% to no gluc + 0.111M sorb
-%C11 KL 29y  SDC to SDC+0.5M Sorb
-%C12 KL 29y  SC 2% to no gluc + 0.111M sorb
-%D11 SC 11-38 SDC to SDC+0.5M Sorb
-%D12 SC 11-38 SC 2% to no gluc + 0.111M sorb
+%A8 SC 37_1 GD 
+%B8 SC 37_2 GD 
+%C8 SC 38_1 GD 
+%D8 SC 38_2 GD 
+%E8 SC 11-38 GD 
+%F8 KL 39 GD  
+%G8 SC 37_1 SDC to SDC+0.5M Sorb
 
 legend_vec = {'11-38 0.5M sorb','11-38 No gluc, 0.111M sorb'} %'39y 1 0.5M sorb','39y 1 No gluc, 0.111M sorb','39y 2 0.5M sorb','39y 2 No gluc, 0.111M sorb', '29y 1 0.5M sorb','29y 1 No gluc, 0.111M sorb'}
 
 %Micromanager positions: Pos0, Pos1, etc.  
 %JSO positions p1,p2,etc
 
-wellvecSP.SC = {'D11','D12'};
-wellvecSP.KL = {'A11','A12','B11','B12'} %RFP: {'A11','A12','B11','B12', 'C11','C12'}; %YFP: {'A11','A12','B11','B12'}
+wellvecSP.SC = {'A8','B8','G8'};  %RFP_only 'C8','D8','E8'
+wellvecSP.KL = {'F8'};
 Nsites = 4;
 
 for sp = 1:length(species_cell);
@@ -173,7 +172,7 @@ if get_data == 1
             %remove bad positions (NAs)
             pos_fnames = pos_fnames(~strcmp(pos_fnames,'NA'));
             %this function should take a list of positions as an input
-            [tracks,times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species, imdir, maxdisp_1x,pos_fnames,channels,channel_to_image,time_calc,imbg);
+            [tracks,times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species, imdir, maxdisp_1x,pos_fnames,channels,channels_to_image,time_calc,imbg);
             all_tracks.(phase) = tracks;
             all_times.(phase) = times + shift_timing(ph);
        end
@@ -187,10 +186,152 @@ else
     load([base_dir,fname_saveSP.(species)],'all_times_vec','all_tracks_vec','posvec')   
 end
 
+
+%the site I want to image is B11 which is the first site in the stored
+%data. A11 has a bad first image.
+
+sites = {'A8','G8'};
+site_list = {'A8','B8','G8'}; 
+
+%normalize by transforming all points linearly from the range spanning the
+%minimum to the maximum value of the mean for all experiments to 0-1.
+norm_val_max.(channels_to_image{1}) = 1;
+norm_val_max.(channels_to_image{2}) = 1;
+norm_val_min.(channels_to_image{1}) = 100;
+norm_val_min.(channels_to_image{2}) = 100;
+
+for si = 1:length(sites);
+    site = sites{si};
+    site_ind = find(strcmp(site_list,site));
+    all_tracks = all_tracks_vec{site_ind};
+    all_times = all_times_vec{site_ind};
+
+    for ph = 1:length(phases)
+        figure(ph)
+        clf
+        phase = phases{ph};
+        Ntracks = length(all_tracks.(phase));
+        Ntimes = length(all_times.(phase));
+        times_ind = 1:Ntimes;
+        for ch = 1:length(channels_to_image)
+            channel = channels_to_image{ch};
+            %Build data storage matrix
+            sing_cell_tracks_nfmat = zeros(Ntracks,Ntimes);
+             %Go through each track and place it in the correct row at the
+             %appropriate timepoint.
+            clear tracks
+            for jj = 1:Ntracks;
+                  tracks_row_nf = [all_tracks.(phase)(jj).nf.(channel)];
+                  tracks_row_nmi = [all_tracks.(phase)(jj).nmi.(channel)];
+                  tracks_row_times = [all_tracks.(phase)(jj).times];
+                  sing_cell_tracks_nfmat(jj,[all_tracks.(phase)(jj).times])= tracks_row_nf;
+                  tracks(jj).nf = tracks_row_nf;
+                  tracks(jj).nmi = tracks_row_nmi;
+                  tracks(jj).times = tracks_row_times;
+            end
+            
+            [mean_nf, std_nf] = nf_calcs(times_ind,tracks);
+            sing_cell_tracks.(site).(phase).nf_mat.(channel) = sing_cell_tracks_nfmat;
+            sing_cell_tracks.(site).(phase).nf_mean.(channel) = mean_nf;
+            norm_val_max.(channel) = max(norm_val_max.(channel),max(mean_nf));
+            norm_val_min.(channel) = min(norm_val_min.(channel),min(mean_nf));
+            sing_cell_tracks.(site).(phase).nf_std.(channel) = std_nf;
+            [mean_nmi, std_nmi] = nmi_calcs(times_ind,tracks);
+            sing_cell_tracks.(site).(phase).nmi_mean.(channel) = mean_nmi;
+            sing_cell_tracks.(site).(phase).nmi_std.(channel) = std_nmi;            
+            sing_cell_tracks.(site).(phase).nmi_std.(channel) = std_nmi;
+            sing_cell_tracks.(site).(phase).times = all_times.(phase);
+        end
+        
+    end
+    
+    
+end
+
+%Normalize by norm_val
+%plot
+phase = 'Post'
+site = 'A8'
+%condition = '2% Glu -> 0.5M Sorbitol';
+condition = '2% Glu -> no gluc, 0.11M Sorb';
+
+figure(1)
+channel = channels_to_image{1};
+sing_cell_mat_1 = sing_cell_tracks.(site).(phase).nf_mat.(channel);
+sing_cell_mat_1_norm = (sing_cell_mat_1-norm_val_min.(channel))/(norm_val_max.(channel)-norm_val_min.(channel));
+
+%sort rows: by max value in the first channel, first 4 timepoints.
+[sing_cell_mat_1_norm_sorted,sort_ind] = sortrows(sing_cell_mat_1_norm,[-1,-2,-3,-4]);
+zero_shift = (0-norm_val_min.(channel))/(norm_val_max.(channel)-norm_val_min.(channel));
+sing_cell_mat_1_norm_sorted(sing_cell_mat_1_norm_sorted==zero_shift) = nan;
+
+[nr,nc] = size(sing_cell_mat_1_norm_sorted);
+pcolor([sing_cell_mat_1_norm_sorted nan(nr,1); nan(1,nc+1)]);
+colormap(cool)
+shading flat;
+set(gca, 'ydir', 'reverse');
+colorbar
+title(['SC: SC.MSN2 nuclear localization. ', condition, '.'])
+ylabel('Cells')
+xlabel('Time')
+set(gca,'XTick',1:length([sing_cell_tracks.(site).(phase).times])+0.5)
+set(gca,'XTickLabel',sprintf('%0.0f|',[sing_cell_tracks.(site).(phase).times]))
+caxis([-0.4,4])
+
+figure(2)
+channel = channels_to_image{2};
+sing_cell_mat_2 = sing_cell_tracks.(site).(phase).nf_mat.(channel);
+sing_cell_mat_2_norm = (sing_cell_mat_2-norm_val_min.(channel))/(norm_val_max.(channel)-norm_val_min.(channel));
+%sort using index from previous channel
+sing_cell_mat_2_norm_sorted = sing_cell_mat_2_norm(sort_ind,:);
+zero_shift = (0-norm_val_min.(channel))/(norm_val_max.(channel)-norm_val_min.(channel));
+sing_cell_mat_2_norm_sorted(sing_cell_mat_2_norm_sorted==zero_shift) = nan;
+
+[nr,nc] = size(sing_cell_mat_2_norm_sorted);
+pcolor([sing_cell_mat_2_norm_sorted nan(nr,1); nan(1,nc+1)]);
+colormap(cool)
+shading flat;
+set(gca, 'ydir', 'reverse');
+colorbar
+title(['SC: KL.MSN2 nuclear localization. ', condition, '.'])
+ylabel('Cells')
+xlabel('Time')
+set(gca,'XTick',1:length([sing_cell_tracks.(site).(phase).times])+0.5)
+set(gca,'XTickLabel',sprintf('%0.0f|',[sing_cell_tracks.(site).(phase).times]))
+caxis([-0.4,4])
+
+figure(3)
+clf 
+hold on
+cmap = cool(length([sing_cell_tracks.(site).(phase).times]));
+[Ncells,Ntimes] = size(sing_cell_mat_1);
+for jj = 1:Ntimes;
+    cell_vec_1 = sing_cell_mat_1(:,jj);
+    cell_vec_1 = cell_vec_1(sing_cell_mat_1(:,jj)>0);
+    cell_vec_2 = sing_cell_mat_2(:,jj);
+    cell_vec_2 = cell_vec_2(sing_cell_mat_1(:,jj)>0); %used same filter intentionally - although should be the same
+    scatter(cell_vec_1,cell_vec_2,5,cmap(jj,:),'filled')
+    corr_vec(jj) = corr(cell_vec_1,cell_vec_2);
+end
+xlabel('SC.MSN2(RFP)')
+ylabel('KL.MSN2(YFP)')
+title(['SC: ',condition])
+axis([1,14,1,9])
+%scatterplot of data altering color
+
+figure(4)
+plot([sing_cell_tracks.(site).(phase).times],corr_vec,'LineWidth',3)
+title(['SC: ',condition,'. Correlation SC.MSN2 n.loc. to KL.MSN2 n.loc'])
+xlabel('Time')
+ylabel('Corr')
+axis([10,70,0,1])
+return
+   
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder
 %cmap = jet(length(legend_vec));
 cmap = [1,0,0;
 0,0,0];
+
 
 
 figure(1)
@@ -392,17 +533,6 @@ times_ind = 1:length(all_times_vec_YFP);
 [nf_mean_RFP, nf_std_RFP] = nf_calcs(times_ind,tracks);
 [nf_mean_RFP, nf_std_RFP] = nf_calcs(times_ind,tracks);
 
-%Build data storage matrix
-coord_tracks
-
-%Go through each track
-%for each data point
-%match cells from each image
-%save NF and NMI for each point
-
-%place data from the track at the appropriate time point
-
-%plot along with mean data
 
 
 

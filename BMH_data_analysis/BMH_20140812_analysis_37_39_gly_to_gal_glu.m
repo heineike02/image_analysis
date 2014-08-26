@@ -1,4 +1,4 @@
-function all_tracks = BMH_20140703_analysis_39Y_sorb_GD()
+function all_tracks = BMH_20140812_analysis_37_39_gly_to_gal_glu()
 
 profile on
 ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
@@ -15,7 +15,7 @@ fname_conv = 'Micromanager'
 %imdirPhase.Pre = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_pre_1\'
 %imdirPhase.Post = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_post_1\'
 
-base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20140703_39y_GD_sorb_p5M\'
+base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20140812_37_39_gly_to_gal_glu\'
 imdirPhase.Pre = [base_dir,'Pre\']
 imdirPhase.Post = [base_dir,'Post\']
 %imdirPhase.Rep = [base_dir,'Gluc_Rep_Post\']
@@ -24,14 +24,14 @@ imdirPhase.Post = [base_dir,'Post\']
 species = 'KL' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
 species_cell = {'SC','KL'}
 
-channels = {'BF','RFP','YFP'}
-channel_to_image = 'YFP'
+channels = {'BF','RFP','GFP'}
+channel_to_image = 'GFP'
 
-fname_saveSP.KL = ['20140703_processed_data_KL_',channel_to_image, '.mat'];
-fname_saveSP.SC = '20140703_processed_data_SC.mat';
+fname_saveSP.KL = ['20140812_processed_data_KL_', channel_to_image, '.mat'];
+fname_saveSP.SC = ['20140812_processed_data_SC_', channel_to_image, '.mat'];
 
 phases =  {'Pre','Post'} %,'Post'} 
-shift_timing = [0,10.5]    
+shift_timing = [0,6+3];    
 %These are the absolute times at which each phase starts.
 %timestep method
 %time_calc:  Tells the program how to calculate each time value.  If the
@@ -47,6 +47,8 @@ shift_timing = [0,10.5]
 %addpath('C:/Users/Ben/Documents/GitHub/image_analysis/jsonlab');
 %time_calc_phase.Pre  = 'metadata.txt'
 %time_calc_phase.Post = 'metadata.txt'
+%Extract times from metadata in micromanager images by first generating
+%metadata_parsed.txt files with python
 generate_metadata_parsed = 0;
 metadata_conv_fname = 'C:\Users\Ben\Documents\GitHub\image_analysis\times_from_umanager_metadata.py';
 if generate_metadata_parsed ==1;
@@ -58,7 +60,6 @@ if generate_metadata_parsed ==1;
 end
 time_calc_phase.Pre =  'metadata_parsed.txt';
 time_calc_phase.Post = 'metadata_parsed.txt';
-
 
 %std thresh for calling a peak to find a cell
 %0.16 seemed to work best for k.lactis on 16JUL images
@@ -74,7 +75,7 @@ maxdisp_1x = 4;
 op_amp =  '1.5x'
 storeim = 1;
 
-bgimg = 0; 
+bgimg = 1; 
 %1 if you have a background image, 0 if you don't. 
 %Gets background image depending on channel to image
 %Collect background images using micromanager 
@@ -83,9 +84,9 @@ if bgimg == 0
 else
     %imbg = imread([base_dir,'BG\',channel_to_image,'_p1.tiff']);
     if strcmp(channel_to_image,'RFP')
-         imbg = imread([base_dir,'\BG\img_000000000_RFP_001.tif']);
-    elseif strcmp(channel_to_image,'YFP')
-         imbg = imread([base_dir,'\BG\img_000000000_YFP_001.tif']);
+         imbg = imread([base_dir,'BG\img_000000000_RFP_001.tif']);
+    elseif strcmp(channel_to_image,'GFP')
+         imbg = imread([base_dir,'BG\img_000000000_GFP_001.tif']);
          %imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\YFP_BG\img_000000000_Default_000.tiff');
     else
          'Error: imbg not assigned'
@@ -104,23 +105,27 @@ else
     %assumption
     imbg = medfilt2(imbg,[coarse_smooth,coarse_smooth],'symmetric');
 end
-%all locations had 4 sites
-%A11 KL 39y1 SDC to SDC+0.5M Sorb
-%A12 KL 39y1 SC 2% to no gluc + 0.111M sorb
-%B11 KL 39y2 SDC to SDC+0.5M Sorb
-%B12 KL 39y2 SC 2% to no gluc + 0.111M sorb
-%C11 KL 29y  SDC to SDC+0.5M Sorb
-%C12 KL 29y  SC 2% to no gluc + 0.111M sorb
-%D11 SC 11-38 SDC to SDC+0.5M Sorb
-%D12 SC 11-38 SC 2% to no gluc + 0.111M sorb
 
-legend_vec = {'11-38 0.5M sorb','11-38 No gluc, 0.111M sorb'} %'39y 1 0.5M sorb','39y 1 No gluc, 0.111M sorb','39y 2 0.5M sorb','39y 2 No gluc, 0.111M sorb', '29y 1 0.5M sorb','29y 1 No gluc, 0.111M sorb'}
+%Start at .81%gly
+%all locations had 4 sites
+%A11 KL(39) Gly -> 2% Gal
+%B11 KL Gly -> 2% Glu
+%C11 KL Gly -> 3% Gly
+%D11 KL Gly -> no glu, .111M sorb
+%E11 SC (37) Gly -> 2% Gal
+%F11 SC Gly -> 2% Glu
+%G11 SC Gly -> 3% Gly
+%H11 SC Gly -> no glu, .111M sorb
+
+%SC 
+legend_vec =   {'.81% Gly -> 2% Gal','.81% Gly -> 2%Glu','.81% Gly -> 3% Gly','.81% Gly -> 0.111M Sorb'}; 
+%{'37_1 GD','37_2 GD','38_1 GD','38_2 GD','11-38 GD','37_1 0.5M Sorb'};
 
 %Micromanager positions: Pos0, Pos1, etc.  
 %JSO positions p1,p2,etc
 
-wellvecSP.SC = {'D11','D12'};
-wellvecSP.KL = {'A11','A12','B11','B12'} %RFP: {'A11','A12','B11','B12', 'C11','C12'}; %YFP: {'A11','A12','B11','B12'}
+wellvecSP.KL = {'A11','B11','C11','D11'};
+wellvecSP.SC = {'E11','F11','G11','H11'};
 Nsites = 4;
 
 for sp = 1:length(species_cell);
@@ -133,13 +138,14 @@ for sp = 1:length(species_cell);
 end
 
 %Remove various sites from list 
-%G1 site 2 has no cells
-%posvecSP.SC{7,3} = 'NA'
+%G11 site 0 has no cells
+posvecSP.SC{3,1} = 'NA'
+%H11 site 3 has only 2 cells - see if it works
+
 %difficult combinatorics for E1 site 0 - some big cells right next to each
 %other but nothing obvious
 %posvecSP.SC{5,1} = 'NA'
 %posvecSP.SC{5,3} = 'NA'
-
 
 
 % posvec.SC = {'A7_site1','p2','p3';
@@ -164,7 +170,7 @@ all_tracks_vec = [];
 all_times_vec = [];
 posvec = posvecSP.(species);
 if get_data == 1 
-    for jj = 1:length(wellvecSP.(species))
+    for jj = 1:length(legend_vec)
        for ph = 1:length(phases);
             phase = phases{ph};
             imdir = imdirPhase.(phase);
@@ -188,9 +194,9 @@ else
 end
 
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder
-%cmap = jet(length(legend_vec));
-cmap = [1,0,0;
-0,0,0];
+cmap = jet(length(legend_vec));
+%cmap = [1,0,0;
+%0,0,0];
 
 
 figure(1)
@@ -261,38 +267,35 @@ set(htitle,'String','Condition')
 title('Number of cells identified')
 
 
-
+%return 
 figure(4)
 clf 
 hold on
-legend_vec_RFP = {'(KL.MSN2) 39y 1 No gluc, 0.111M sorb';
-    '(KL.MSN2) 39y 1 0.5M sorb';
-    %'(KL.MSN2) 39y 2 0.5M sorb';
-    %'(KL.MSN2) 39y 2 No gluc, 0.111M sorb';
-    '(KL.MSN2) 29y 1 No gluc, 0.111M sorb';
-    '(KL.MSN2) 29y 1 0.5M sorb'}
 
-fname_save = '20140703_processed_data_KL_RFP.mat';
+fname_save = '20140812_processed_data_SC_RFP.mat';
 load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')   
 %all_times_vec_RFP = all_times_vec;
 %all_tracks_vec_RFP = all_tracks_vec;
 %posvec_RFP = posvec;
 
-% cmap = [0,0,1; 
-% 0,1,0.5; 
-% 0,.3333,.8333;
-% 0,0.6667,0.6667;
-% 1,0,0;
-% 0,0,0]
+ {'.81% Gly -> 2% Gal','0.81% Gly -> 2%Glu','.81% Gly -> 3% Gly','.81% Gly -> 0.111M Sorb'}; 
 
-cmap = [0,0,1; 
- .5,0.25,0; 
- %0,.3333,.8333;
- %0,0.6667,0.6667;
- 0,0,0;
- 1,0,0];
 
-perm = [2,1,6,5];
+legend_vec_RFP = {'(SC.MSN2) 0.81% Gly -> 2% Gal' ;
+    '(SC.MSN2) 0.81% Gly -> 3% Gly'; 
+    '(SC.MSN2) 0.81% Gly -> 2% Glu';
+    '(SC.MSN2) 0.81% Gly -> 0.111M Sorb'
+    }
+
+
+cmap = [1,0,0; 
+0,1,0; 
+0,0,1;
+0,0,0;
+];
+
+%perm = [1,6,2,5,3,4];
+perm = [1,3,2,4];
 
 for jj = 1:length(legend_vec_RFP)
     all_tracks = all_tracks_vec{perm(jj)};
@@ -308,34 +311,28 @@ for jj = 1:length(legend_vec_RFP)
 end
 
 
-% legend_vec_YFP = {'(SC.MSN2) 39y 1 0.5M sorb';
-%     '(SC.MSN2) 39y 1 No gluc, 0.111M sorb';
-%     '(SC.MSN2) 39y 2 0.5M sorb';
-%     '(SC.MSN2) 39y 2 No gluc, 0.111M sorb'};
+legend_vec_GFP = {'(KL.MSN2) 0.81% Gly -> 2% Gal' ;
+    '(KL.MSN2) 0.81% Gly -> 3% Gly';
+    '(KL.MSN2) 0.81% Gly -> 2% Glu';
+    '(KL.MSN2) 0.81% Gly -> 0.111M Sorb'
+    }
 
-legend_vec_YFP = {'(SC.MSN2) 39y 1 No gluc, 0.111M sorb';
-    '(SC.MSN2) 39y 1 0.5M sorb';
-%    '(SC.MSN2) 39y 2 0.5M sorb';
-%    '(SC.MSN2) 39y 2 No gluc, 0.111M sorb'
-     };
+cmap = [1,0,0; 
+0,1,0; 
+0,0,1;
+0,0,0;
+];
 
-cmap = [0,0,1; 
- .5,0.25,0; 
- %0,.3333,.8333;
- %0,0.6667,0.6667;
- %0,0,0;
- %1,0,0
- ];
+%perm = [1,3,2];
+perm = [1,3,2,4];
 
-perm = [2,1];
- 
-fname_save = '20140703_processed_data_KL_YFP.mat';
-load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec') 
+fname_saveSP = '20140812_processed_data_SC_GFP.mat';
+load([base_dir,fname_saveSP],'all_times_vec','all_tracks_vec','posvec') 
 %all_times_vec_YFP = all_times_vec;
 %all_tracks_vec_YFP = all_tracks_vec;
 %posvec_YFP = posvec;
 
-for jj = 1:length(legend_vec_YFP)
+for jj = 1:length(legend_vec_GFP)
     all_tracks = all_tracks_vec{perm(jj)};
     all_times = all_times_vec{perm(jj)};
     color_val = cmap(jj,:);
@@ -350,61 +347,97 @@ for jj = 1:length(legend_vec_YFP)
 end
 
 %combine legend vectors
-legend_vec = [legend_vec_RFP;legend_vec_YFP];
+legend_vec = [legend_vec_RFP;legend_vec_GFP];
 hleg = legend(plt_grp,legend_vec) %,'Location','NE');
 htitle = get(hleg,'Title');
 %set(htitle,'String','Condition')
-title('KL.MSN2 and SC.MSN2 response to glucose dropout and sorbitol in KL')
+title('SC: KL.MSN2 and SC.MSN2 shift from Gly')
 xlabel('time')
 ylabel('Nuclear Localization')
 
 
+figure(5)
+clf 
+hold on
 
-%For a particular condition
-site = 1;   %this is the index in the saved data for A11,KL 39y1 SDC to SDC+0.5M Sorb 
-%For a particular phase
-phase = 'Post'
+fname_save = '20140812_processed_data_KL_RFP.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')   
+%all_times_vec_RFP = all_times_vec;
+%all_tracks_vec_RFP = all_tracks_vec;
+%posvec_RFP = posvec;
 
-%load data for each color
-fname_save = '20140703_processed_data_KL_RFP.mat';
-load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec') 
-all_times_vec_RFP = all_times_vec;
-all_tracks_vec_RFP = all_tracks_vec;
 
-all_times_RFP =  all_times_vec_RFP{site}.(phase);
-all_tracks_RFP = all_tracks_vec_RFP{site}.(phase);
+legend_vec_RFP = {'(KL.MSN2) 0.81% Gly -> 2% Gal' ;
+    '(KL.MSN2) 0.81% Gly -> 3% Gly';
+    '(KL.MSN2) 0.81% Gly -> 2% Glu';
+    '(KL.MSN2) 0.81% Gly -> 0.111M Sorb'
+    }
 
-fname_save = '20140703_processed_data_KL_YFP.mat';
-load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec') 
-all_times_vec_YFP = all_times_vec;
-all_tracks_vec_YFP = all_tracks_vec;
+cmap = [1,0,0; 
+0,1,0; 
+0,0,1;
+0,0,0;
+];
 
-all_times_YFP = all_times_vec_YFP{site}.(phase);
-all_tracks_YFP = all_tracks_vec_YFP{site}.(phase);
+perm = [1,3,2,4];
 
-if length(all_times_YFP) ~= length(all_times_RFP)
-    'Error - different number of time points in each channel'
+for jj = 1:length(legend_vec_RFP)
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        times = all_times.(phases{ph});
+        p = plot_meanvalues(times,tracks,color_val,0,'nf','linewidth',1.5);
+        set(p,'Parent',plt_grp(jj))
+    end
 end
 
-times_ind = 1:length(all_times_vec_YFP);
 
-%Find mean 
-[nf_mean_RFP, nf_std_RFP] = nf_calcs(times_ind,tracks);
-[nf_mean_RFP, nf_std_RFP] = nf_calcs(times_ind,tracks);
-
-%Build data storage matrix
-coord_tracks
-
-%Go through each track
-%for each data point
-%match cells from each image
-%save NF and NMI for each point
-
-%place data from the track at the appropriate time point
-
-%plot along with mean data
+legend_vec_GFP = {'(SC.MSN2) 0.81% Gly -> 2% Gal' ;
+    '(SC.MSN2) 0.81% Gly -> 3% Gly';
+    '(SC.MSN2) 0.81% Gly -> 2% Glu';
+    '(SC.MSN2) 0.81% Gly -> 0.111M Sorb'
+    }
 
 
+cmap = [1,0,0; 
+0,1,0; 
+0,0,1;
+0,0,0;
+];
+
+perm = [1,3,2,4];
+
+fname_save = '20140812_processed_data_KL_GFP.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec') 
+%all_times_vec_YFP = all_times_vec;
+%all_tracks_vec_YFP = all_tracks_vec;
+%posvec_YFP = posvec;
+
+for jj = 1:length(legend_vec_GFP)
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    kk = jj+length(legend_vec_GFP); %step up plot group
+    plt_grp(kk) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        times = all_times.(phases{ph});
+        p = plot_meanvalues(times,tracks,color_val,0,'nf','linewidth',1.5,'LineStyle',':');
+        set(p,'Parent',plt_grp(kk))
+    end
+end
+
+%combine legend vectors
+legend_vec = [legend_vec_RFP;legend_vec_GFP];
+hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('KL: KL.MSN2 and SC.MSN2 shift from Gly')
+xlabel('time')
+ylabel('Nuclear Localization')
 
 profile off
 end
