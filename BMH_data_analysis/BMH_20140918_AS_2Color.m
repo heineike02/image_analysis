@@ -1,4 +1,5 @@
-function all_tracks = BMH_20140703_analysis_39Y_sorb_GD_2Color()
+function all_tracks = BMH_20140918_AS_2Color()
+%
 
 profile on
 ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
@@ -15,23 +16,24 @@ fname_conv = 'Micromanager'
 %imdirPhase.Pre = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_pre_1\'
 %imdirPhase.Post = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_post_1\'
 
-base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20140703_39y_GD_sorb_p5M\'
+base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20140918_AS_4uM_p2uM\'
 imdirPhase.Pre = [base_dir,'Pre\']
 imdirPhase.Post = [base_dir,'Post\']
 %imdirPhase.Rep = [base_dir,'Gluc_Rep_Post\']
 
 %input information from experiment here
-species = 'KL' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
+species = 'SC' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
 species_cell = {'SC','KL'} 
 
 channels = {'BF','RFP','YFP'}
-channels_to_image = {'RFP','YFP'}
+%too much motion to link cells
+channel_to_image = {'RFP','YFP'}  %if this is just one channel just list it as a text variable i.e. 'RFP'. 
 
-fname_saveSP.KL = '20140703_processed_data_KL_2color.mat';
+fname_saveSP.SC = '20140918_processed_data_SC_2Color.mat';
 %fname_saveSP.SC = '20140703_processed_data_SC.mat'; 
 
 phases =  {'Pre','Post'} %,'Post'} 
-shift_timing = [0,10.5]    
+shift_timing = [0,12]    
 %These are the absolute times at which each phase starts.
 %timestep method
 %time_calc:  Tells the program how to calculate each time value.  If the
@@ -74,7 +76,7 @@ maxdisp_1x = 4;
 op_amp =  '1.5x'
 storeim = 1;
 
-bgimg = 0; 
+bgimg = 1; 
 %1 if you have a background image, 0 if you don't. 
 %Gets background image depending on channel to image
 %Collect background images using micromanager 
@@ -82,45 +84,57 @@ if bgimg == 0
     imbg = 1; % default
 else
     %imbg = imread([base_dir,'BG\',channel_to_image,'_p1.tiff']);
-    if strcmp(channel_to_image,'RFP')
-         imbg = imread([base_dir,'\BG\img_000000000_RFP_001.tif']);
-    elseif strcmp(channel_to_image,'YFP')
-         imbg = imread([base_dir,'\BG\img_000000000_YFP_001.tif']);
-         %imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\YFP_BG\img_000000000_Default_000.tiff');
+    if iscell(channel_to_image)    
+        ch2i = channel_to_image;
     else
-         'Error: imbg not assigned'
+        ch2i = {channel_to_image};
     end
+   
+    for jj = 1:length(ch2i)
+        ch2i_txt = ch2i{jj}
+        if strcmp(ch2i_txt,'RFP')
+             imbg_jj = imread([base_dir,'BG\img_000000000_RFP_001.tif']);
+        elseif strcmp(ch2i_txt,'YFP')
+             imbg_jj = imread([base_dir,'BG\img_000000000_YFP_001.tif']);
+            %imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\YFP_BG\img_000000000_Default_000.tiff');
+        else
+             'Error: imbg not assigned'
+        end
     
-    if strcmp(fname_conv,'JSO')
-        imbg = imbg';  %micromanager images are the inverse of images collected by JSO image collection scripts.
-    end
+        if strcmp(fname_conv,'JSO')
+            imbg_jj = imbg_jj';  %micromanager images are the inverse of images collected by JSO image collection scripts.
+        end
     
-    %Convert imbg to double and median filter
-    imbg = double(imbg);
-    coarse_smooth = 25;
-    %smooths background image using course_smooth parameter.  Boundary
-    %conditions are symmetric because default 0 bc's causes strange artifacts
-    %on the edges.  For these background images symmetric BCs is a good
-    %assumption
-    imbg = medfilt2(imbg,[coarse_smooth,coarse_smooth],'symmetric');
+        %Convert imbg to double and median filter
+        imbg_jj = double(imbg_jj);
+        coarse_smooth = 25;
+        %smooths background image using course_smooth parameter.  Boundary
+        %conditions are symmetric because default 0 bc's causes strange artifacts
+        %on the edges.  For these background images symmetric BCs is a good
+        %assumption
+        imbg_jj = medfilt2(imbg_jj,[coarse_smooth,coarse_smooth],'symmetric');
+        imbg.(ch2i_txt) = imbg_jj;
 end
 %all locations had 4 sites
-%A11 KL 39y1 SDC to SDC+0.5M Sorb
-%A12 KL 39y1 SC 2% to no gluc + 0.111M sorb
-%B11 KL 39y2 SDC to SDC+0.5M Sorb
-%B12 KL 39y2 SC 2% to no gluc + 0.111M sorb
-%C11 KL 29y  SDC to SDC+0.5M Sorb
-%C12 KL 29y  SC 2% to no gluc + 0.111M sorb
-%D11 SC 11-38 SDC to SDC+0.5M Sorb
-%D12 SC 11-38 SC 2% to no gluc + 0.111M sorb
+%4uM 1-NM-PP1 
+%A1 37, 
+%A2 42-1, 
+%A3 42-2, 
+%0.2uM: 
+%A4 42-1, 
+%A5 42-2 
+%0 
+%A6 37 
+%A7 42-1, 
+%A8 42-2
 
-legend_vec = {'11-38 0.5M sorb','11-38 No gluc, 0.111M sorb'} %'39y 1 0.5M sorb','39y 1 No gluc, 0.111M sorb','39y 2 0.5M sorb','39y 2 No gluc, 0.111M sorb', '29y 1 0.5M sorb','29y 1 No gluc, 0.111M sorb'}
+legend_vec = {'37 4uM','42_1 4uM', '42_2 4uM','42_1 0.2 uM1' , '42_2 0.2 uM', '37 cont','42_1 cont', '42_2 cont'} %'39y 1 0.5M sorb','39y 1 No gluc, 0.111M sorb','39y 2 0.5M sorb','39y 2 No gluc, 0.111M sorb', '29y 1 0.5M sorb','29y 1 No gluc, 0.111M sorb'}
 
 %Micromanager positions: Pos0, Pos1, etc.  
 %JSO positions p1,p2,etc
 
-wellvecSP.SC = {'D11','D12'};
-wellvecSP.KL = {'A11','A12','B11','B12'} %RFP: {'A11','A12','B11','B12', 'C11','C12'}; %YFP: {'A11','A12','B11','B12'}
+wellvecSP.SC = {'A1','B1','C1','D1', 'E1', 'F1', 'G1', 'H1'};  %RFP_only 'C8','D8','E8'
+wellvecSP.KL = {'F8'};
 Nsites = 4;
 
 for sp = 1:length(species_cell);
@@ -133,8 +147,11 @@ for sp = 1:length(species_cell);
 end
 
 %Remove various sites from list 
-%G1 site 2 has no cells
-%posvecSP.SC{7,3} = 'NA'
+%C1 site 3 starts off with no cells - Remove
+%B1 site 3 starts off with no cells - Remove
+%A1 Site 3 starts off with one cell
+posvecSP.SC{2,4} = 'NA'
+posvecSP.SC{3,4} = 'NA'
 %difficult combinatorics for E1 site 0 - some big cells right next to each
 %other but nothing obvious
 %posvecSP.SC{5,1} = 'NA'
@@ -173,7 +190,7 @@ if get_data == 1
             %remove bad positions (NAs)
             pos_fnames = pos_fnames(~strcmp(pos_fnames,'NA'));
             %this function should take a list of positions as an input
-            [tracks,times] = KL_vs_SC_analysis_2color(ipdir,storeim,fname_conv,op_amp,std_threshSP,species, imdir, maxdisp_1x,pos_fnames,channels,channels_to_image,time_calc,imbg);
+            [tracks,times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species, imdir, maxdisp_1x,pos_fnames,channels,channel_to_image,time_calc,imbg);
             all_tracks.(phase) = tracks;
             all_times.(phase) = times + shift_timing(ph);
        end
@@ -188,13 +205,11 @@ else
 end
 
 
-% I should really break up these plot commands into functions....
-%{
 %the site I want to image is B11 which is the first site in the stored
 %data. A11 has a bad first image.
 
-sites = {'B11','B12'};
-site_list = {'A11','A12','B11','B12'};
+sites ={'A1','B1','C1','D1', 'E1', 'F1', 'G1', 'H1'};
+wellvecSP.SC = {'A1','B1','C1','D1', 'E1', 'F1', 'G1', 'H1'};
 
 %normalize by transforming all points linearly from the range spanning the
 %minimum to the maximum value of the mean for all experiments to 0-1.
@@ -251,10 +266,12 @@ for si = 1:length(sites);
     
 end
 
+
+%{
 %Normalize by norm_val
 %plot
 phase = 'Post'
-site = 'B12'
+site = 'A8'
 %condition = '2% Glu -> 0.5M Sorbitol';
 condition = '2% Glu -> no gluc, 0.11M Sorb';
 
@@ -274,11 +291,12 @@ colormap(cool)
 shading flat;
 set(gca, 'ydir', 'reverse');
 colorbar
-title(['KL: KL.MSN2 nuclear localization. ', condition, '.'])
+title(['SC: SC.MSN2 nuclear localization. ', condition, '.'])
 ylabel('Cells')
 xlabel('Time')
-set(gca,'XTickLabel',sprintf('%0.2f|',[sing_cell_tracks.(site).(phase).times]))
-caxis([-0.3,3.1])
+set(gca,'XTick',1:length([sing_cell_tracks.(site).(phase).times])+0.5)
+set(gca,'XTickLabel',sprintf('%0.0f|',[sing_cell_tracks.(site).(phase).times]))
+caxis([-0.4,4])
 
 figure(2)
 channel = channels_to_image{2};
@@ -295,11 +313,12 @@ colormap(cool)
 shading flat;
 set(gca, 'ydir', 'reverse');
 colorbar
-title(['KL: SC.MSN2 nuclear localization. ', condition, '.'])
+title(['SC: KL.MSN2 nuclear localization. ', condition, '.'])
 ylabel('Cells')
 xlabel('Time')
-set(gca,'XTickLabel',sprintf('%0.2f|',[sing_cell_tracks.(site).(phase).times]))
-caxis([-0.3,3.1])
+set(gca,'XTick',1:length([sing_cell_tracks.(site).(phase).times])+0.5)
+set(gca,'XTickLabel',sprintf('%0.0f|',[sing_cell_tracks.(site).(phase).times]))
+caxis([-0.4,4])
 
 figure(3)
 clf 
@@ -314,26 +333,25 @@ for jj = 1:Ntimes;
     scatter(cell_vec_1,cell_vec_2,5,cmap(jj,:),'filled')
     corr_vec(jj) = corr(cell_vec_1,cell_vec_2);
 end
-xlabel('KL.MSN2(RFP)')
-ylabel('SC.MSN2(YFP)')
-title(['KL: ',condition])
-axis([1,4,1,4.5])
+xlabel('SC.MSN2(RFP)')
+ylabel('KL.MSN2(YFP)')
+title(['SC: ',condition])
+axis([1,14,1,9])
 %scatterplot of data altering color
 
 figure(4)
 plot([sing_cell_tracks.(site).(phase).times],corr_vec,'LineWidth',3)
-title(['KL: ',condition,'. Correlation KL.MSN2 n.loc. to SC.MSN2 n.loc'])
+title(['SC: ',condition,'. Correlation SC.MSN2 n.loc. to KL.MSN2 n.loc'])
 xlabel('Time')
 ylabel('Corr')
-axis([10,55,0,1])
-return
-   
+axis([10,70,0,1])
+
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder
 %cmap = jet(length(legend_vec));
 cmap = [1,0,0;
 0,0,0];
 
-
+%}
 
 figure(1)
 clf 
@@ -346,7 +364,7 @@ for jj = 1:length(legend_vec)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         times = all_times.(phases{ph});
-        p = plot_meanvalues(times,tracks,[],color_val,0,'nf','linewidth',1.5);
+        p = plot_meanvalues(times,tracks,color_val,0,'nf','linewidth',1.5);
         set(p,'Parent',plt_grp(jj))
     end
 end
@@ -403,17 +421,16 @@ set(htitle,'String','Condition')
 title('Number of cells identified')
 
 
-%}
 
 figure(4)
 clf 
 hold on
-legend_vec_RFP = {'(KL.MSN2) No gluc, 0.111M sorb';
-    '(KL.MSN2) 0.5M sorb'}
+legend_vec_RFP = {'(KL.MSN2) 39y 1 No gluc, 0.111M sorb';
+    '(KL.MSN2) 39y 1 0.5M sorb';
     %'(KL.MSN2) 39y 2 0.5M sorb';
     %'(KL.MSN2) 39y 2 No gluc, 0.111M sorb';
-    %'(KL.MSN2) 29y 1 No gluc, 0.111M sorb';
-    %'(KL.MSN2) 29y 1 0.5M sorb'}
+    '(KL.MSN2) 29y 1 No gluc, 0.111M sorb';
+    '(KL.MSN2) 29y 1 0.5M sorb'}
 
 fname_save = '20140703_processed_data_KL_RFP.mat';
 load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')   
@@ -429,16 +446,13 @@ load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
 % 0,0,0]
 
 cmap = [0,0,1; 
- 1,0,0]
- 
- %0,0,1;
- %.5,0.25,0; 
+ .5,0.25,0; 
  %0,.3333,.8333;
  %0,0.6667,0.6667;
- %0,0,0;
- %1,0,0];
+ 0,0,0;
+ 1,0,0];
 
-perm = [4,3];
+perm = [2,1,6,5];
 
 for jj = 1:length(legend_vec_RFP)
     all_tracks = all_tracks_vec{perm(jj)};
@@ -448,7 +462,7 @@ for jj = 1:length(legend_vec_RFP)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         times = all_times.(phases{ph});
-        p = plot_meanvalues(times,tracks,[],color_val,0,'nf','linewidth',1.5);
+        p = plot_meanvalues(times,tracks,color_val,0,'nf','linewidth',1.5);
         set(p,'Parent',plt_grp(jj))
     end
 end
@@ -459,21 +473,21 @@ end
 %     '(SC.MSN2) 39y 2 0.5M sorb';
 %     '(SC.MSN2) 39y 2 No gluc, 0.111M sorb'};
 
-legend_vec_YFP = {'(SC.MSN2) No gluc, 0.111M sorb';
-    '(SC.MSN2) 0.5M sorb';
+legend_vec_YFP = {'(SC.MSN2) 39y 1 No gluc, 0.111M sorb';
+    '(SC.MSN2) 39y 1 0.5M sorb';
 %    '(SC.MSN2) 39y 2 0.5M sorb';
 %    '(SC.MSN2) 39y 2 No gluc, 0.111M sorb'
      };
 
 cmap = [0,0,1; 
- 1,0,0; 
+ .5,0.25,0; 
  %0,.3333,.8333;
  %0,0.6667,0.6667;
  %0,0,0;
  %1,0,0
  ];
 
-perm = [4,3];
+perm = [2,1];
  
 fname_save = '20140703_processed_data_KL_YFP.mat';
 load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec') 
@@ -490,7 +504,7 @@ for jj = 1:length(legend_vec_YFP)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         times = all_times.(phases{ph});
-        p = plot_meanvalues(times,tracks,[],color_val,0,'nf','linewidth',1.5,'LineStyle',':');
+        p = plot_meanvalues(times,tracks,color_val,0,'nf','linewidth',1.5,'LineStyle',':');
         set(p,'Parent',plt_grp(kk))
     end
 end
@@ -500,12 +514,12 @@ legend_vec = [legend_vec_RFP;legend_vec_YFP];
 hleg = legend(plt_grp,legend_vec) %,'Location','NE');
 htitle = get(hleg,'Title');
 %set(htitle,'String','Condition')
-title('KL.MSN2 and SC.MSN2 response to glucose dropout and sorbitol in K.Lactis')
+title('KL.MSN2 and SC.MSN2 response to glucose dropout and sorbitol in KL')
 xlabel('time')
 ylabel('Nuclear Localization')
 
 
-%{
+
 %For a particular condition
 site = 1;   %this is the index in the saved data for A11,KL 39y1 SDC to SDC+0.5M Sorb 
 %For a particular phase
@@ -543,7 +557,6 @@ times_ind = 1:length(all_times_vec_YFP);
 
 profile off
 end
-%}
 
 
 

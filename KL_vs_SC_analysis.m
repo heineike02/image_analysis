@@ -61,7 +61,7 @@ elseif strcmp(op_amp,'1.5x')
     radSP.SC = 11;
     multiplier = 1.5;
 else
-    'Error - incorect optical amplification parameter'
+    'Error - incorrect optical amplification parameter'
 end
 
 %Note: these are currently hard coded in
@@ -105,6 +105,7 @@ for nn = 1:positions
             time_vals = time_vals + time_valsCH.(channels_to_image{ch});
         end
         time_vals = time_vals/length(channels_to_image);
+        channel_to_image = channels_to_image; %convert back to cell so that subsequent subroutines recognize there are two channels. 
         
     else 
                

@@ -25,7 +25,7 @@ species = 'KL' %if I wanted to cycle would make a cell {'SC'}  %Right now not pr
 species_cell = {'SC','KL'}
 
 channels = {'BF','RFP','YFP'}
-channel_to_image = 'YFP'
+channel_to_image = 'RFP'
 
 fname_saveSP.KL = ['20140703_processed_data_KL_',channel_to_image, '.mat'];
 fname_saveSP.SC = '20140703_processed_data_SC.mat';
@@ -204,7 +204,7 @@ for jj = 1:length(legend_vec)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         times = all_times.(phases{ph});
-        p = plot_meanvalues(times,tracks,color_val,0,'nf','linewidth',1.5);
+        p = plot_meanvalues(times,tracks,[],color_val,0,'nf','linewidth',1.5); 
         set(p,'Parent',plt_grp(jj))
     end
 end

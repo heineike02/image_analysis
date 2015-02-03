@@ -21,14 +21,16 @@ imdirPhase.Post = [base_dir,'Post\']
 %imdirPhase.Rep = [base_dir,'Gluc_Rep_Post\']
 
 %input information from experiment here
-species = 'KL' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
+species = 'SC' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
 species_cell = {'SC','KL'}
 
 channels = {'BF','RFP','GFP'}
-channel_to_image = 'GFP'
+channel_to_image = {'RFP','GFP'}
 
-fname_saveSP.KL = ['20140812_processed_data_KL_', channel_to_image, '.mat'];
-fname_saveSP.SC = ['20140812_processed_data_SC_', channel_to_image, '.mat'];
+%fname_saveSP.KL = ['20140812_processed_data_KL_', channel_to_image, '.mat'];
+%fname_saveSP.SC = ['20140812_processed_data_SC_', channel_to_image, '.mat'];
+fname_saveSP.SC = ['20140812_processed_data_SC_2color.mat'];
+
 
 phases =  {'Pre','Post'} %,'Post'} 
 shift_timing = [0,6+5+14.0/60.0];    
@@ -83,27 +85,42 @@ if bgimg == 0
     imbg = 1; % default
 else
     %imbg = imread([base_dir,'BG\',channel_to_image,'_p1.tiff']);
-    if strcmp(channel_to_image,'RFP')
+    if iscell(channel_to_image)
+        for ch = 1:length(channels);
+            channel = channels{ch};
+            imbg_ch = imread([base_dir,'BG\img_000000000_',channel,'_001.tif']);
+            
+            %Convert imbg to double and median filter
+            imbg_ch = double(imbg_ch);
+            coarse_smooth = 25;
+            %smooths background image using course_smooth parameter.  Boundary
+            %conditions are symmetric because default 0 bc's causes strange artifacts
+            %on the edges.  For these background images symmetric BCs is a good
+            %assumption
+            imbg.(channel) = medfilt2(imbg_ch,[coarse_smooth,coarse_smooth],'symmetric');
+        end
+    else
+        if strcmp(channel_to_image,'RFP')
          imbg = imread([base_dir,'BG\img_000000000_RFP_001.tif']);
-    elseif strcmp(channel_to_image,'GFP')
+        elseif strcmp(channel_to_image,'GFP')
          imbg = imread([base_dir,'BG\img_000000000_GFP_001.tif']);
          %imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\YFP_BG\img_000000000_Default_000.tiff');
-    else
+        else
          'Error: imbg not assigned'
+        end
+        if strcmp(fname_conv,'JSO')
+            imbg = imbg';  %micromanager images are the inverse of images collected by JSO image collection scripts.
+        end
+
+        %Convert imbg to double and median filter
+        imbg = double(imbg);
+        coarse_smooth = 25;
+        %smooths background image using course_smooth parameter.  Boundary
+        %conditions are symmetric because default 0 bc's causes strange artifacts
+        %on the edges.  For these background images symmetric BCs is a good
+        %assumption
+        imbg = medfilt2(imbg,[coarse_smooth,coarse_smooth],'symmetric');    
     end
-    
-    if strcmp(fname_conv,'JSO')
-        imbg = imbg';  %micromanager images are the inverse of images collected by JSO image collection scripts.
-    end
-    
-    %Convert imbg to double and median filter
-    imbg = double(imbg);
-    coarse_smooth = 25;
-    %smooths background image using course_smooth parameter.  Boundary
-    %conditions are symmetric because default 0 bc's causes strange artifacts
-    %on the edges.  For these background images symmetric BCs is a good
-    %assumption
-    imbg = medfilt2(imbg,[coarse_smooth,coarse_smooth],'symmetric');
 end
 
 %all locations had 4 sites
@@ -190,6 +207,9 @@ else
     load([base_dir,fname_saveSP.(species)],'all_times_vec','all_tracks_vec','posvec')   
 end
 
+
+'data saved'
+return
 %set colormap (i.e. map = cool(8)) perhaps make use of ColorOrder
 cmap = jet(length(legend_vec));
 %cmap = [1,0,0;

@@ -24,9 +24,11 @@ for pos in pos_names:
     json_data=open(imdirbase+imdir+'metadata.txt')
     data = json.load(json_data)
     json_data.close()
-    #Get Initial Time and convert to datetime object
+    #Get Initial Time and convert to datetime object also removes timezone from string since that changes and can screw things up. 
     t0_str = data['Summary']['Time']
-    fmt = '%Y-%m-%d %H:%M:%S -0700'
+    t0_str_sp = t0_str.split()
+    t0_str = t0_str_sp[0] + ' ' + t0_str_sp[1]
+    fmt = '%Y-%m-%d %H:%M:%S'
     t0 = datetime.strptime(t0_str,fmt)
     
     nFrames = data['Summary']['Frames']
@@ -42,6 +44,8 @@ for pos in pos_names:
                     #print frame_name
                     #parsed_data.write('Position Channel Zstack Frame Time')
                     t1_str = data[frame_name]['Time'] 
+                    t1_str_sp = t1_str.split()
+                    t1_str = t1_str_sp[0] + ' ' + t1_str_sp[1]
                     t1 = datetime.strptime(t1_str,fmt)
                     tt = t1 - t0 
                     tt = tt.seconds/60.0
@@ -52,6 +56,8 @@ for pos in pos_names:
                 #print frame_name
                 #parsed_data.write('Position Channel Zstack Frame Time')
                 t1_str = data[frame_name]['Time'] 
+                t1_str_sp = t1_str.split()
+                t1_str = t1_str_sp[0] + ' ' + t1_str_sp[1]
                 t1 = datetime.strptime(t1_str,fmt)
                 tt = t1 - t0 
                 tt = tt.seconds/60.0

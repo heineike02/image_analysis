@@ -25,7 +25,7 @@ species = 'SC' %if I wanted to cycle would make a cell {'SC'}  %Right now not pr
 species_cell = {'SC','KL'} 
 
 channels = {'BF','RFP','YFP'}
-channels_to_image = {'RFP','YFP'}
+channel_to_image = {'RFP','YFP'}  %if this is just one channel just list it as a text variable i.e. 'RFP'. 
 
 fname_saveSP.SC = '20140716_processed_data_SC_2color.mat';
 %fname_saveSP.SC = '20140703_processed_data_SC.mat'; 
@@ -172,7 +172,7 @@ if get_data == 1
             %remove bad positions (NAs)
             pos_fnames = pos_fnames(~strcmp(pos_fnames,'NA'));
             %this function should take a list of positions as an input
-            [tracks,times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species, imdir, maxdisp_1x,pos_fnames,channels,channels_to_image,time_calc,imbg);
+            [tracks,times] = KL_vs_SC_analysis(ipdir,storeim,fname_conv,op_amp,std_threshSP,species, imdir, maxdisp_1x,pos_fnames,channels,channel_to_image,time_calc,imbg);
             all_tracks.(phase) = tracks;
             all_times.(phase) = times + shift_timing(ph);
        end

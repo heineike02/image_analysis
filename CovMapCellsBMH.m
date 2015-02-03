@@ -1,4 +1,4 @@
-function timecoursedata =CovMapCellsBMH_2color(imdir,images, channel, circ, imbg , siz , storeim, rad, std_thresh, time_vals)
+function timecoursedata =CovMapCellsBMH(imdir,images, channel, circ, imbg , siz , storeim, rad, std_thresh, time_vals)
 %function which finds cells in a  given image
 %di = folder containing .tif images (string), 
 %images = list of image filenames to use in the form of a cell with N string entries.
@@ -29,6 +29,7 @@ if iscell(channel) && (length(channel)==2) %matches spots for two colors
     channels = channel;
     N = length(images.(channels{1}));
 else
+    channels = []
     N = length(images.(channel));
 end
 
@@ -59,11 +60,12 @@ timecoursedata = struct('name','','celldata',[],'time',0);
 timecoursedata(1:N,1) = timecoursedata(1);
 
 for jj = 1:N
-    if iscell(channel) && (length(channel)==2)
+    if iscell(channels) && (length(channels)==2)
         for ch = 1:length(channels);
             channel = channels{ch};
             imnames = images.(channel);
             imname = imnames(jj);
+            imbg_ch = imbg.(channel);
             strcat(int2str(jj), {' of '}, int2str(N), {' Channel = '}, channel, {' '}, imname  )
             im = imread(char(strcat(imdir,imname)));
       %     if bf_flag == 1
@@ -71,7 +73,7 @@ for jj = 1:N
       %     else
             bf_mask = [];
        %    end
-            celldataCH.(channel) = FindCellsBMH(im, circ, bf_mask , imbg , siz, storeim, rad, std_thresh);
+            celldataCH.(channel) = FindCellsBMH(im, circ, bf_mask , imbg_ch , siz, storeim, rad, std_thresh);
             %change this if I ever add another channel
         end
 
@@ -80,18 +82,20 @@ for jj = 1:N
         %celldata = match_two_channels(celldataCH.(channels{1}),channels{1},celldataCH.(channels{2}),channels{2},L);
         %My algorithm breaks on 20140703 A11_site1.  
         celldata = match_two_channels_Hung(celldataCH.(channels{1}),channels{1},celldataCH.(channels{2}),channels{2},L);
-
+        %Make this function handle a situation where no cells are detected.
+        
     else
        imnames = images.(channel);
        imname = imnames(jj);
        strcat(int2str(jj), {' of '}, int2str(N), {' Channel = '}, channel, {' '}, imname  )
        im = imread(char(strcat(imdir,imname)));
+       imbg_ch = imbg.(channel);
        %     if bf_flag == 1
        %         bf_mask = imread(char(strcat(imdir,images.BF{jj})));
        %    else
        bf_mask = [];
        %    end
-       celldata = FindCellsBMH(im, circ, bf_mask , imbg , siz, storeim, rad, std_thresh);
+       celldata = FindCellsBMH(im, circ, bf_mask , imbg_ch , siz, storeim, rad, std_thresh);
 
     end
 

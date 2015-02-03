@@ -14,7 +14,8 @@ function [STATS] = bfanalyze(BFim, FLUORim, shift);
 %                   'MeanIntensity' - mean intensity of each cell       %
 %                   'PixelValues' - intensities of each pixel in cell   %
 %                                                                       %
-%                                                                       %
+%Note: relies on imfindcircles, in the image processing toolbox 
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -30,7 +30,7 @@ elseif ischar(time_calc)
             time_vals(jj) = time;
        end
    elseif strcmp(fname_conv,'Micromanager')
-       [~,Channel,~,Frame,Time] =  import_metadata_parsed([imdir,pos_fnames_nn,'\',time_calc])
+       [~,Channel,~,Frame,Time] =  import_metadata_parsed([imdir,pos_fnames_nn,'\',time_calc]);
        chan_ind = strcmp(Channel,channel_to_image);
        time_vals = Time(chan_ind);
        

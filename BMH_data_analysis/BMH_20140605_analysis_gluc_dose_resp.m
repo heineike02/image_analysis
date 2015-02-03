@@ -20,7 +20,7 @@ imdirPhase.Post = [base_dir,'Post\']
 %imdirPhase.Rep = [base_dir,'Gluc_Rep_Post\']
 
 %input information from experiment here
-species = 'KL' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
+species = 'SC' %if I wanted to cycle would make a cell {'SC'}  %Right now not properly cycling through each species
 species_cell = {'SC','KL'}
 
 fname_saveSP.KL = 'gluc_drop_doseresp_procdata_KL.mat';
@@ -179,6 +179,46 @@ end
 
 
 figure(1)
+%For BBC Poster, DEC 2014
+clf 
+hold on
+
+index_vec = [1,2,3,4]
+cmap = [1,0,0; % Positive control
+0,0,0; %Negative control - black    
+.5,.9,1; %Glucose Dropout no sorbitol balance
+0,0,1] %Glucose dropout
+
+for jj = 1:length(index_vec)
+    kk = index_vec(jj)
+    all_tracks = all_tracks_vec{kk};
+    all_times = all_times_vec{kk};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        times = all_times.(phases{ph});
+        p = plot_meanvalues(times,tracks,[], color_val,0,'nf','linewidth',1.5); 
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+
+
+hleg = legend(plt_grp,{'SDC + 0.5M Sorbitol','SDC','SD no glucose','SD no glucose + 0.11M Sorbitol'}) %,'Location','NE');
+htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('S.Cerevisiae')
+xlabel('time')
+ylabel('SC.MSN2 Nuclear Localization')
+
+
+return
+
+
+
+figure(1)
+%For old lab meetings - figure 2 and on don't work with current code. 
 clf 
 hold on
 
@@ -198,7 +238,7 @@ for jj = 1:length(index_vec)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         times = all_times.(phases{ph});
-        p = plot_meanvalues(times,tracks,color_val,0,'nf');
+        p = plot_meanvalues(times,tracks,[], color_val,0,'nf'); 
         set(p,'Parent',plt_grp(jj))
     end
 end
