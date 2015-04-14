@@ -6,6 +6,10 @@ from datetime import datetime
 #Tracer()()
 #This function makes a new metadata file (metadata_parsed.txt) from metadata.txt for images collected in micromanager in order to extract the times
 
+#The number of frames is set at the beginning of the experiment:  If you have to stop the experiment early, you need to 
+#change the number of frames in the metadata file (find and replace "Frames": N) There
+#is a powershell routine for this named FrameNoShift.ps1
+
 #imdirbase = 'C:\\Users\\Ben\\Documents\\Data\\PKA_project\\20140709_37_38_39_sorb_p5M\\Pre\\'
 
 imdirbase = sys.argv[1]

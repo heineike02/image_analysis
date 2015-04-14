@@ -1,4 +1,4 @@
-function all_tracks = BMH_20150123_Hog1_Msn2_Osmo()
+function all_tracks = BMH_20150409_sdc_osmo_time_shift()
 %
 
 profile on
@@ -16,9 +16,9 @@ fname_conv = 'Micromanager'
 %imdirPhase.Pre = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_pre_1\'
 %imdirPhase.Post = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_post_1\'
 
-base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20150123_Hog_MSN2_GD_Osmo\'
-imdirPhase.Pre = [base_dir,'Pre\']
-imdirPhase.Post = [base_dir,'Post\']
+base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20150409_osmo_stress_by_time\'
+imdirPhase.Pre = [base_dir,'Pre',filesep]
+imdirPhase.Post = [base_dir,'Post',filesep]
 %imdirPhase.Post_p2 = [base_dir,'Post_p2\']
 %imdirPhase.Rep = [base_dir,'Gluc_Rep_Post\']
 
@@ -30,7 +30,7 @@ channels = {'BF','RFP','YFP'}
 %too much motion to link cells
 channel_to_image = {'RFP','YFP'}  %if this is just one channel just list it as a text variable i.e. 'RFP'. 
 
-fname_saveSP.SC = '20150123_processed_data_SC_Msn2.mat';
+fname_saveSP.SC = '20150410_processed_data_SC.mat';
 fname_saveSP.KL = '20141210_processed_data_KL.mat';
 %fname_saveSP.SC = '20140703_processed_data_SC.mat'; 
 
@@ -51,12 +51,13 @@ shift_timing = [0,8]
 %addpath('C:/Users/Ben/Documents/GitHub/image_analysis/jsonlab');
 %time_calc_phase.Pre  = 'metadata.txt'
 %time_calc_phase.Post = 'metadata.txt'
-generate_metadata_parsed = 0;
-metadata_conv_fname = 'C:\Users\Ben\Documents\GitHub\image_analysis\times_from_umanager_metadata.py';
+generate_metadata_parsed = 1;
+metadata_conv_fname = [ipdir,'times_from_umanager_metadata.py'];
 if generate_metadata_parsed ==1;
     for ph = [1:length(phases)]
           phase = phases{ph};
           imdir = imdirPhase.(phase);
+          phase = ['python ', metadata_conv_fname, ' ', imdir]
           system(['python ', metadata_conv_fname, ' ', imdir])
     end
 end
@@ -78,7 +79,7 @@ maxdisp_1x = 4;
 op_amp =  '1.5x'
 storeim = 1;
 
-bgimg = 1; 
+bgimg = 0; 
 %1 if you have a background image, 0 if you don't. 
 %Gets background image depending on channel to image
 %Collect background images using micromanager 
@@ -105,9 +106,9 @@ else
     for jj = 1:length(ch2i)
         ch2i_txt = ch2i{jj}
         if strcmp(ch2i_txt,'RFP')
-             imbg_jj = imread([base_dir,'BG\img_000000000_RFP_001.tif']);
+             imbg_jj = imread([base_dir,'BG',filesep,'img_000000000_RFP_001.tif']);
         elseif strcmp(ch2i_txt,'YFP')
-             imbg_jj = imread([base_dir,'BG\img_000000000_YFP_001.tif']);
+             imbg_jj = imread([base_dir,'BG',filesep,'img_000000000_YFP_001.tif']);
             %imbg = imread('C:\Users\Ben\Box Sync\Data\PKA_Project\20140423\YFP_BG\img_000000000_Default_000.tiff');
         else
              'Error: imbg not assigned'
@@ -129,20 +130,18 @@ else
     end
 end
 %all locations had 4 sites
-% A9: Hog1-YFP 2% Gluc + .5M Gluc
-% B9: Msn2 (KL and SC) 2% Gluc + .5M Gluc
-% C9: Hog1-YFP 2% Gluc + .5M Sorb
-% D9: Msn2 (KL and SC) 2% Gluc + .5M Sorb
-% E9 Hog1-YFP .11M Sorb
-% F9: Msn2 (KL and SC) .11M Sorb
-% G9: Hog1-YFP SDC
-% H9: Msn2 (KL and SC) SDC
+%SC 42: 
+%A4: SDC -> SDC + 0.25M Sorb t6 
+%B4: SDC -> SDC + 0.25M Sorb t18 
+%C4: SDC -> SDC + 0.25M Sorb t36 
+%D4: SDC -> SDC + 0.25M Sorb t48 
+%E4: SDC replaced + 0.25M Sorb t6 
+%F4: SDC replaced + 0.25M Sorb t18 
+%G4: no change + 0.25M Sorb t6 
+%H4: no change + 0.25M Sorb t18
 
-%Micromanager positions: Pos0, Pos1, etc.  
-%JSO positions p1,p2,etc
 
-%Hog wells {'A9','C9','E9','G9'}
-wellvecSP.SC = {'B9','D9','F9','H9'};  %RFP_only 'C8','D8','E8'
+wellvecSP.SC = {'A4','B4','C4','D4','E4','F4','G4','H4'}; 
 wellvecSP.KL = {};
 Nsites = 4;
 
@@ -157,18 +156,11 @@ end
 
 %Remove various sites from list 
 
-%Hog wells: 
-%A9 position 3 had no cells:
-%posvecSP.SC{1,4} = 'NA'
-
-%MSN2 bad data
-%B9 position 2 just two cells
-posvecSP.SC{1,3} = 'NA'
-
-%H9 position 0 no cells
-posvecSP.SC{4,1} = 'NA'
-%H9 position 2 no cells
-posvecSP.SC{4,3} = 'NA'
+%bad data
+%F4 well 0,1 pre and 1,2 post had red blob
+posvecSP.SC{6,1} = 'NA'
+posvecSP.SC{6,2} = 'NA'
+posvecSP.SC{6,3} = 'NA'
 
 
 % posvec.SC = {'A7_site1','p2','p3';
@@ -218,48 +210,52 @@ end
 
 
 
-%all locations had 4 sites
-% A9: Hog1-YFP 2% Gluc + .5M Gluc
-% B9: Msn2 (KL and SC) 2% Gluc + .5M Gluc
-% C9: Hog1-YFP 2% Gluc + .5M Sorb
-% D9: Msn2 (KL and SC) 2% Gluc + .5M Sorb
-% E9 Hog1-YFP .11M Sorb
-% F9: Msn2 (KL and SC) .11M Sorb
-% G9: Hog1-YFP SDC
-% H9: Msn2 (KL and SC) SDC
 
 
+%% Mean time traces
 
-%{
-%% Hog1 and Msn2 osmo figure
+%SC 42: 
+%A4: SDC -> SDC + 0.25M Sorb t6 
+%B4: SDC -> SDC + 0.25M Sorb t18 
+%C4: SDC -> SDC + 0.25M Sorb t36 
+%D4: SDC -> SDC + 0.25M Sorb t48 
+%E4: SDC replaced + 0.25M Sorb t6 
+%F4: SDC replaced + 0.25M Sorb t18 
+%G4: no change + 0.25M Sorb t6 
+%H4: no change + 0.25M Sorb t18
 
 figure(1)
 clf
 hold on
-channel = []
-%legend_vec_RFP = {'(KL.MSN2) t1: Gluc DO t2: Gluc DO + 0.5M Sorb';'(KL.MSN2) t1: SDC, t2: 0.5M Sorb'}
-legend_vec_Hog1 = {'Hog1-YFP 2% Gluc + .5M Gluc',
-    'Hog1-YFP 2% Gluc + .5M Sorb',
-    'Hog1-YFP .11M Sorb',
-    'Hog1-YFP SDC'}
-%    '(SC.MSN2) 42 t1: 4uM 1-NM-PP1, t2: 4uM 1-NM-PP1 + 0.5M Sorbitol', 
-%    '(SC.MSN2) 42 t1: 4uM 1-NM-PP1, t2: SDC', 
-%    '(SC.MSN2) 37 t1: 4uM 1-NM-PP1, t2: 4uM 1-NM-PP1 + 0.5M Sorbitol'}
-fname_save = '20150123_processed_data_SC_Hog1.mat';
+channel = 'RFP'
+legend_vec_RFP = {'SDC -> SDC + 0.25M Sorb t6',
+'SDC -> SDC + 0.25M Sorb t18', 
+'SDC -> SDC + 0.25M Sorb t36', 
+'SDC -> SDC + 0.25M Sorb t48', 
+'SDC replaced + 0.25M Sorb t6', 
+'SDC replaced + 0.25M Sorb t18', 
+'no change + 0.25M Sorb t6', 
+'no change + 0.25M Sorb t18'}
+fname_save = '20150410_processed_data_SC.mat';
 load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
-%all_times_vec_Hog1 = all_times_vec;
-%all_tracks_vec_Hog1 = all_tracks_vec;
-%posvec_Hog1 = posvec;
 cmap = [1,0,0;  %Red
- 0,1,0;  %Green
+ 1,0.35,0; %light red
  0,0,1;  %Blue
- 0,0,0   %Black
+ 0,0.5,1;  %Light blue 
+ 0,1,0; %green
+ 0,1,0.5; %orange
+ 0.2,0.2,0.2; %gray
+ 0,0,0   %black
  ];  
 
 %cmap = jet(length(legend_vec_RFP));
 %perm = 1:length(legend_vec_RFP);
-perm = [1,2,3,4] ;
-legend_vec_Hog1 = legend_vec_Hog1(perm);
+perm = [1,2,3,4,5,6,7,8] ;
+N_RFP = length(perm)
+legend_vec_RFP = legend_vec_RFP(perm);
+cmap = cmap(perm,:);
+plot_params = {'linewidth',1.5,'LineStyle','-'};
+plt_grp = zeros(length(legend_vec_RFP),1);
 for jj = 1:length(perm)
     all_tracks = all_tracks_vec{perm(jj)};
     all_times = all_times_vec{perm(jj)};
@@ -268,36 +264,178 @@ for jj = 1:length(perm)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         timevals = all_times.(phases{ph});
-        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','linewidth',1.5,'LineStyle','--');
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+hleg = legend(plt_grp,legend_vec_RFP) %,'Location','NE');
+htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('SC.Msn2, Osmo shock folowing media replacement')
+xlabel('time')
+ylabel('Nuclear Localization')
+
+figure(2)
+clf 
+hold on
+channel = 'YFP'
+legend_vec_YFP = {'SDC -> SDC + 0.25M Sorb t6',
+'SDC -> SDC + 0.25M Sorb t18', 
+'SDC -> SDC + 0.25M Sorb t36', 
+'SDC -> SDC + 0.25M Sorb t48', 
+'SDC replaced + 0.25M Sorb t6', 
+'SDC replaced + 0.25M Sorb t18', 
+'no change + 0.25M Sorb t6', 
+'no change + 0.25M Sorb t18'}
+fname_save = '20150410_processed_data_SC.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+cmap = [1,0,0;  %Red
+ 1,0.35,0; %light red
+ 0,0,1;  %Blue
+ 0,0.5,1;  %Light blue 
+ 0,1,0; %green
+ 0,1,0.5; %orange
+ 0.2,0.2,0.2; %gray
+ 0,0,0   %black
+ ];  
+
+%cmap = jet(length(legend_vec_RFP));
+%perm = 1:length(legend_vec_RFP);
+perm = [1,2,3,4,5,6,7,8] ;
+legend_vec_YFP = legend_vec_YFP(perm);
+cmap = cmap(perm,:);
+plot_params = {'linewidth',1.5,'LineStyle',':'};
+plt_grp = zeros(length(legend_vec_YFP),1);
+for jj = 1:length(perm)
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        timevals = all_times.(phases{ph});
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
         set(p,'Parent',plt_grp(jj))
     end
 end
 
 
+hleg = legend(plt_grp,legend_vec_YFP) %,'Location','NE');
+htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('KL.Msn2, Osmo shock folowing media replacement')
+xlabel('time')
+ylabel('Nuclear Localization')
+%}
+
+
+
+return
+
+% 
+% %combine legend vectors
+% legend_vec = [legend_vec_RFP;legend_vec_YFP];
+% hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+% htitle = get(hleg,'Title');
+% %set(htitle,'String','Condition')
+% title('SC.Hog1, KL.Msn2, SC.Msn2 response in S.Cerevisiae cells')
+% xlabel('time')
+% ylabel('Nuclear Localization')
+% %}
+
+%% Just SC.MSN2
+
+figure(2)
+clf
+hold on
+plt_grp = []
 channel = 'RFP'
-%legend_vec_RFP = {'(KL.MSN2) t1: Gluc DO t2: Gluc DO + 0.5M Sorb';'(KL.MSN2) t1: SDC, t2: 0.5M Sorb'}
-legend_vec_Msn2_RFP = {'SC MSN2-RFP 2% Gluc + .5M Gluc',
-    'SC MSN2-RFP 2% Gluc + .5M Sorb',
-    'SC MSN2-RFP .11M Sorb',
-    'SC MSN2-RFP SDC'}
-%    '(SC.MSN2) 42 t1: 4uM 1-NM-PP1, t2: 4uM 1-NM-PP1 + 0.5M Sorbitol', 
-%    '(SC.MSN2) 42 t1: 4uM 1-NM-PP1, t2: SDC', 
-%    '(SC.MSN2) 37 t1: 4uM 1-NM-PP1, t2: 4uM 1-NM-PP1 + 0.5M Sorbitol'}
-fname_save = '20150123_processed_data_SC_Msn2.mat';
+legend_vec_RFP = {'(SC.MSN2) GD -> GD + 0.25M Sorb t6', 
+'(SC.MSN2) SDC -> SDC + 0.25M Sorb t6', 
+'(SC.MSN2) GD -> GD + 0.25M Sorb t12', 
+'(SC.MSN2) SDC -> SDC + 0.25M Sorb t12', 
+'(SC.MSN2) GD -> GD + 0.25M Sorb t18', 
+'(SC.MSN2) SDC -> SDC + 0.25M Sorb t18', 
+'(SC.MSN2) 2uM NMPP1 -> 0.25M Sorb t6 + 2uM NMPP1', 
+'(SC.MSN2) 2uM NMPP1 -> 0.25M Sorb t18 + 2uM NMPP1'}
+fname_save = '20150204_processed_data_SC.mat';
 load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
-%all_times_vec_Msn2 = all_times_vec;
-%all_tracks_vec_Msn2 = all_tracks_vec;
-%posvec_Msn2 = posvec;
-cmap = [1,0,0;  %Red
- 0,1,0;  %Green
- 0,0,1;  %Blue
- 0,0,0   %Black
- ];  
+cmap = [0,0,1;  %Blue
+ 1,0,0;  %Red
+  0,0.5,1;  %Light blue 
+ 1,0.35,0; %light red
+ 0,1,1; %Cyan
+ 1,0.7,0; %orange
+ 0.2,0.2,0.2; %gray
+ 0,0,0   %black
+ ]; 
 
 %cmap = jet(length(legend_vec_RFP));
 %perm = 1:length(legend_vec_RFP);
-perm = [1,2,3,4] ;
-legend_vec_Msn2_RFP = legend_vec_Msn2_RFP(perm);
+perm = [1,3,5,2,4,6] ;
+legend_vec_RFP = legend_vec_RFP(perm);
+cmap = cmap(perm,:);
+plot_params = {'linewidth',1.5,'LineStyle','-'};
+N_RFP = length(perm);
+for jj = 1:N_RFP
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        timevals = all_times.(phases{ph});
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+
+%plot w/ legend
+legend_vec = [legend_vec_RFP];
+hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('SC.MSN2 Gluc Drop followed by 0.25M Sorb')
+xlabel('time')
+ylabel('Nuclear Localization')
+%axis([0,90,1.5,6.5])
+%}
+
+
+figure(3)
+clf
+hold on
+plt_grp = []
+channel = 'YFP'
+legend_vec_YFP = {'(KL.MSN2) GD -> GD + 0.25M Sorb t6', 
+'(KL.MSN2) SDC -> SDC + 0.25M Sorb t6', 
+'(KL.MSN2) GD -> GD + 0.25M Sorb t12', 
+'(KL.MSN2) SDC -> SDC + 0.25M Sorb t12', 
+'(KL.MSN2) GD -> GD + 0.25M Sorb t18', 
+'(KL.MSN2) SDC -> SDC + 0.25M Sorb t18', 
+'(KL.MSN2) 2uM NMPP1 -> 0.25M Sorb t6 + 2uM NMPP1', 
+'(KL.MSN2) 2uM NMPP1 -> 0.25M Sorb t18 + 2uM NMPP1'}
+fname_save = '20150204_processed_data_SC.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+cmap = [0,0,1;  %Blue
+ 1,0,0;  %Red
+  0,0.5,1;  %Light blue 
+ 1,0.35,0; %light red
+ 0,1,1; %Cyan
+ 1,0.7,0; %orange
+ 0.2,0.2,0.2; %gray
+ 0,0,0   %black
+ ];  
+
+
+%cmap = jet(length(legend_vec_RFP));
+%perm = 1:length(legend_vec_RFP);
+perm = [1,3,5,2,4,6] ;
+legend_vec_YFP = legend_vec_YFP(perm);
+cmap = cmap(perm,:);
+plot_params = {'linewidth',1.5,'LineStyle',':'};
 for jj = 1:length(perm)
     all_tracks = all_tracks_vec{perm(jj)};
     all_times = all_times_vec{perm(jj)};
@@ -306,36 +444,161 @@ for jj = 1:length(perm)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         timevals = all_times.(phases{ph});
-        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','linewidth',1.5,'LineStyle','-');
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+legend_vec = [legend_vec_RFP];
+hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('KL.MSN2 Gluc Drop followed by 0.25M Sorb')
+xlabel('time')
+ylabel('Nuclear Localization')
+%}
+
+
+return
+
+%% Mean traces 0.5% plots
+
+figure(3)
+clf
+hold on
+plt_grp = []
+channel = 'RFP'
+legend_vec_RFP = { 
+'(SC.MSN2) 2% -> 2% + 0.5M Glu', 
+'(SC.MSN2) 2% -> 2% + 0.5M Sorb', 
+'(SC.MSN2) 0.5% -> 0.5% + 0.5M Glu', 
+'(SC.MSN2) 0.5% -> 0.5% + 0.5M Sorb', 
+'(SC.MSN2) no glu -> .5M glu', 
+'(SC.MSN2) no glu -> 0.5M Sorb', 
+'(SC.MSN2) 2% -> 0.5% Glu', 
+'(SC.MSN2) 2% -> 0% Glu'}
+fname_save = '20150204_processed_data_SC.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+cmap = [1,0,0;  %Red
+ 0,0,1;  %Blue
+ 1,0,0;  %Red
+ 0,0,1;  %Blue
+ 1,0,0;  %Red
+ 0,0,1;  %Blue
+ 0.5,0.5,0.5; %gray
+ 0,0,0   %black
+ ];  
+
+%cmap = jet(length(legend_vec_RFP));
+%perm = 1:length(legend_vec_RFP);
+perm = [3,4,7,8] ;
+legend_vec_RFP = legend_vec_RFP(perm);
+cmap = cmap(perm,:);
+plot_params = {'linewidth',1.5,'LineStyle','-'};
+N_RFP = length(perm);
+for jj = 1:N_RFP
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        timevals = all_times.(phases{ph});
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
         set(p,'Parent',plt_grp(jj))
     end
 end
 
 channel = 'YFP'
-%legend_vec_RFP = {'(KL.MSN2) t1: Gluc DO t2: Gluc DO + 0.5M Sorb';'(KL.MSN2) t1: SDC, t2: 0.5M Sorb'}
-legend_vec_Msn2_YFP = {'KL MSN2-YFP 2% Gluc + .5M Gluc',
-    'KL MSN2-YFP 2% Gluc + .5M Sorb',
-    'KL MSN2-YFP .11M Sorb',
-    'KL MSN2-YFP SDC'}
-%    '(SC.MSN2) 42 t1: 4uM 1-NM-PP1, t2: 4uM 1-NM-PP1 + 0.5M Sorbitol', 
-%    '(SC.MSN2) 42 t1: 4uM 1-NM-PP1, t2: SDC', 
-%    '(SC.MSN2) 37 t1: 4uM 1-NM-PP1, t2: 4uM 1-NM-PP1 + 0.5M Sorbitol'}
-fname_save = '20150123_processed_data_SC_Msn2.mat';
+legend_vec_YFP = {
+'(KL.MSN2) 2% -> 2% + 0.5M Glu', 
+'(KL.MSN2) 2% -> 2% + 0.5M Sorb', 
+'(KL.MSN2) 0.5% -> 0.5% + 0.5M Glu', 
+'(KL.MSN2) 0.5% -> 0.5% + 0.5M Sorb', 
+'(KL.MSN2) no glu -> .5M glu', 
+'(KL.MSN2) no glu -> 0.5M Sorb', 
+'(KL.MSN2) 2% -> 0.5% Glu', 
+'(KL.MSN2) 2% -> 0% Glu'}
+fname_save = '20150204_processed_data_SC.mat';
 load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
-%all_times_vec_Msn2 = all_times_vec;
-%all_tracks_vec_Msn2 = all_tracks_vec;
-%posvec_Msn2 = posvec;
 cmap = [1,0,0;  %Red
- 0,1,0;  %Green
  0,0,1;  %Blue
- 0,0,0   %Black
+ 1,0,0;  %Red
+ 0,0,1;  %Blue
+ 1,0,0;  %Red
+ 0,0,1;  %Blue
+ 0.5,0.5,0.5; %gray
+ 0,0,0   %black
  ];  
 
 %cmap = jet(length(legend_vec_RFP));
 %perm = 1:length(legend_vec_RFP);
-perm = [1,2,3,4] ;
-legend_vec_Msn2_YFP = legend_vec_Msn2_YFP(perm);
+perm = [3,4,7,8] ;
+legend_vec_YFP = legend_vec_YFP(perm);
+cmap = cmap(perm,:);
+plot_params = {'linewidth',1.5,'LineStyle',':'};
 for jj = 1:length(perm)
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj+N_RFP) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        timevals = all_times.(phases{ph});
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+        set(p,'Parent',plt_grp(jj+N_RFP))
+    end
+end
+
+
+%combine legend vectors
+legend_vec = [legend_vec_RFP;legend_vec_YFP];
+hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('SD 0.5% Glucose')
+xlabel('time')
+ylabel('Nuclear Localization')
+axis([0,90,1.5,6.5])
+%}
+
+
+%% Mean traces no gluc plots
+
+figure(4)
+clf
+hold on
+plt_grp = []
+channel = 'RFP'
+legend_vec_RFP = { 
+'(SC.MSN2) 2% -> 2% + 0.5M Glu', 
+'(SC.MSN2) 2% -> 2% + 0.5M Sorb', 
+'(SC.MSN2) 0.5% -> 0.5% + 0.5M Glu', 
+'(SC.MSN2) 0.5% -> 0.5% + 0.5M Sorb', 
+'(SC.MSN2) no glu -> .5M glu', 
+'(SC.MSN2) no glu -> 0.5M Sorb', 
+'(SC.MSN2) 2% -> 0.5% Glu', 
+'(SC.MSN2) 2% -> 0% Glu'}
+fname_save = '20150204_processed_data_SC.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+cmap = [1,0,0;  %Red
+ 0,0,1;  %Blue
+ 1,0,0;  %Red
+ 0,0,1;  %Blue
+ 1,0,0;  %Red
+ 0,0,1;  %Blue
+ 0.5,0.5,0.5; %gray
+ 0,0,0   %black
+ ];  
+
+%cmap = jet(length(legend_vec_RFP));
+%perm = 1:length(legend_vec_RFP);
+perm = [5,6,7,8] ;
+legend_vec_RFP = legend_vec_RFP(perm);
+cmap = cmap(perm,:);
+plot_params = {'linewidth',1.5,'LineStyle','-'};
+N_RFP = length(perm);
+for jj = 1:N_RFP
     all_tracks = all_tracks_vec{perm(jj)};
     all_times = all_times_vec{perm(jj)};
     color_val = cmap(jj,:);
@@ -343,28 +606,73 @@ for jj = 1:length(perm)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         timevals = all_times.(phases{ph});
-        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','linewidth',1.5,'LineStyle',':');
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
         set(p,'Parent',plt_grp(jj))
+    end
+end
+
+channel = 'YFP'
+legend_vec_YFP = {
+'(KL.MSN2) 2% -> 2% + 0.5M Glu', 
+'(KL.MSN2) 2% -> 2% + 0.5M Sorb', 
+'(KL.MSN2) 0.5% -> 0.5% + 0.5M Glu', 
+'(KL.MSN2) 0.5% -> 0.5% + 0.5M Sorb', 
+'(KL.MSN2) no glu -> .5M glu', 
+'(KL.MSN2) no glu -> 0.5M Sorb', 
+'(KL.MSN2) 2% -> 0.5% Glu', 
+'(KL.MSN2) 2% -> 0% Glu'}
+fname_save = '20150204_processed_data_SC.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+cmap = [1,0,0;  %Red
+ 0,0,1;  %Blue
+ 1,0,0;  %Red
+ 0,0,1;  %Blue
+ 1,0,0;  %Red
+ 0,0,1;  %Blue
+ 0.5,0.5,0.5; %gray
+ 0,0,0   %black
+ ];  
+
+%cmap = jet(length(legend_vec_RFP));
+%perm = 1:length(legend_vec_RFP);
+perm = [5,6,7,8] ;
+legend_vec_YFP = legend_vec_YFP(perm);
+cmap = cmap(perm,:);
+plot_params = {'linewidth',1.5,'LineStyle',':'};
+for jj = 1:length(perm)
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj+N_RFP) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        timevals = all_times.(phases{ph});
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+        set(p,'Parent',plt_grp(jj+N_RFP))
     end
 end
 
 
 %combine legend vectors
-legend_vec = [legend_vec_Hog1;legend_vec_Msn2_RFP;legend_vec_Msn2_YFP];
+legend_vec = [legend_vec_RFP;legend_vec_YFP];
 hleg = legend(plt_grp,legend_vec) %,'Location','NE');
 htitle = get(hleg,'Title');
 %set(htitle,'String','Condition')
-title('SC.Hog1, KL.Msn2, SC.Msn2 response in S.Cerevisiae cells')
+title('SD no Glucose')
 xlabel('time')
 ylabel('Nuclear Localization')
+axis([0,90,1.5,6.5])
 %}
+
+return
+
 
 %%
 
 figure(2)
 clf
 hold on
-
+ 
 channel = []
 %legend_vec_RFP = {'(KL.MSN2) t1: Gluc DO t2: Gluc DO + 0.5M Sorb';'(KL.MSN2) t1: SDC, t2: 0.5M Sorb'}
 legend_vec_Hog1 = {'Hog1-YFP 2% Gluc + .5M Gluc',
@@ -535,8 +843,6 @@ title('KL.Msn2 response in S.Cerevisiae cells')
 xlabel('time')
 ylabel('Nuclear Localization')
 %}
-
-
 
 
 

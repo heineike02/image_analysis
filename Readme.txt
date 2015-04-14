@@ -26,3 +26,7 @@ Spot cells with bright field
 Collect Cell Size
 
 Filter out cells outside of a certain size range
+
+make immune to os (use filesep) and computer (TrackIDL doesn't take ipdir argument)
+
+
