@@ -247,7 +247,7 @@ if make_plots == 1
         0,1,0; %green
         0,1,0.5;
         0.2,0.2,0.2; %gray
-        0,0,0   %black
+        1,0,0   %black
         ];
     
     %cmap = jet(length(legend_vec_RFP));
@@ -380,13 +380,13 @@ if make_plots == 1
         for ph = 1: length(phases)
             tracks = all_tracks.(phases{ph});
             timevals = all_times.(phases{ph});
-            p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+            p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params)
             set(p,'Parent',plt_grp(jj))
         end
     end
     
     
-    hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+    hleg = legend(plt_grp,legend_vec); %,'Location','NE');
     htitle = get(hleg,'Title');
     %set(htitle,'String','Condition')
     title('SC Cells, YFP Channel')
@@ -397,6 +397,8 @@ if make_plots == 1
     %Plot NF and NMI for TM cells - MSN4
     
     figure(5)
+    clf
+    hold on
     perm = [3,4,7,8] ;
     legend_vec = legend_vec_YFP(perm);
     cmap = cmap_YFP(perm,:);
@@ -425,6 +427,8 @@ if make_plots == 1
     %}
     
     figure(6)
+    clf
+    hold on
     perm = [3,4,7,8] ;
     legend_vec = legend_vec_YFP(perm);
     cmap = cmap_YFP(perm,:);
