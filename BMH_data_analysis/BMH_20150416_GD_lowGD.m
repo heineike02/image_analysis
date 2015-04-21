@@ -1,4 +1,4 @@
-function all_tracks = BMH_20150409_sdc_osmo_time_shift()
+function all_tracks = BMH_20150416_GD_lowGD()
 %
 
 profile off
@@ -16,7 +16,7 @@ fname_conv = 'Micromanager'
 %imdirPhase.Pre = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_pre_1\'
 %imdirPhase.Post = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_post_1\'
 
-base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20150409_osmo_stress_by_time\'
+base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20150416_GD_lowGD\'
 imdirPhase.Pre = [base_dir,'Pre',filesep]
 imdirPhase.Post = [base_dir,'Post',filesep]
 %imdirPhase.Post_p2 = [base_dir,'Post_p2\']
@@ -30,12 +30,12 @@ channels = {'BF','RFP','YFP'}
 %too much motion to link cells
 channel_to_image = {'RFP','YFP'}  %if this is just one channel just list it as a text variable i.e. 'RFP'. 
 
-fname_saveSP.SC = '20150410_processed_data_SC.mat';
+fname_saveSP.SC = '20150416_processed_data_SC.mat';
 fname_saveSP.KL = '20141210_processed_data_KL.mat';
 %fname_saveSP.SC = '20140703_processed_data_SC.mat'; 
 
-phases =  {'Pre','Post'}%,'Post_p2'} %,'Post'} 
-shift_timing = [0,8]    
+phases =  {'Pre','Post'} %,'Post_p2'} %,'Post'} 
+shift_timing = [0,10]    
 %These are the absolute times at which each phase starts.
 %timestep method
 %time_calc:  Tells the program how to calculate each time value.  If the
@@ -51,7 +51,7 @@ shift_timing = [0,8]
 %addpath('C:/Users/Ben/Documents/GitHub/image_analysis/jsonlab');
 %time_calc_phase.Pre  = 'metadata.txt'
 %time_calc_phase.Post = 'metadata.txt'
-generate_metadata_parsed = 0;
+generate_metadata_parsed = 1;
 metadata_conv_fname = [ipdir,'times_from_umanager_metadata.py'];
 if generate_metadata_parsed ==1;
     for ph = [1:length(phases)]
@@ -79,7 +79,7 @@ maxdisp_1x = 4;
 op_amp =  '1.5x'
 storeim = 1;
 
-bgimg = 0; 
+bgimg = 1; 
 %1 if you have a background image, 0 if you don't. 
 %Gets background image depending on channel to image
 %Collect background images using micromanager 
@@ -131,17 +131,12 @@ else
 end
 %all locations had 4 sites
 %SC 42: 
-%A4: SDC -> SDC + 0.25M Sorb t6 
-%B4: SDC -> SDC + 0.25M Sorb t18 
-%C4: SDC -> SDC + 0.25M Sorb t36 
-%D4: SDC -> SDC + 0.25M Sorb t48 
-%E4: SDC replaced + 0.25M Sorb t6 
-%F4: SDC replaced + 0.25M Sorb t18 
-%G4: no change + 0.25M Sorb t6 
-%H4: no change + 0.25M Sorb t18
+%GD dilution (0.34% final)
+%GD (0%)
+%GD-low (0.34%)
 
 
-wellvecSP.SC = {'A4','B4','C4','D4','E4','F4','G4','H4'}; 
+wellvecSP.SC = {'A7','B7','C7'}; 
 wellvecSP.KL = {};
 Nsites = 4;
 
@@ -158,9 +153,9 @@ end
 
 %bad data
 %F4 well 0,1 pre and 1,2 post had red blob
-posvecSP.SC{6,1} = 'NA'
-posvecSP.SC{6,2} = 'NA'
-posvecSP.SC{6,3} = 'NA'
+%posvecSP.SC{6,1} = 'NA'
+%posvecSP.SC{6,2} = 'NA'
+%posvecSP.SC{6,3} = 'NA'
 
 
 % posvec.SC = {'A7_site1','p2','p3';
@@ -179,7 +174,7 @@ posvecSP.SC{6,3} = 'NA'
 
 %Obtain and store data for each dose (note: only need to do this once) 
 
-get_data = 0;
+get_data = 1;
 
 all_tracks_vec = [];
 all_times_vec = [];
@@ -209,7 +204,7 @@ else
 end
 
 
-
+return 
 
 
 %% Mean time traces

@@ -209,10 +209,8 @@ else
 end
 
 
-
-
-
-%% Mean time traces
+%% 
+make_plots = 1
 
 %all locations had 4 sites
 %A3 - 46 1 MSN4 (TPK AS). Gluc Drop
@@ -224,112 +222,241 @@ end
 %G3 - 47 SDC
 %H3 - 47 Tm 2.5 ug/ml
 
-figure(1)
-clf
-hold on
-channel = 'RFP'
-legend_vec_RFP = {'(46 SC.MSN2 1) SDC -> SD-Gluc',
-'(46 SC.MSN2 2) SDC -> SD-Gluc', 
-'(47 SC.MSN2 1) SDC -> SD-Gluc', 
-'(47 SC.MSN2 2) SDC -> SD-Gluc', 
-'(49 SC.MSN2) SDC -> SD-Gluc', 
-'(42 SC.MSN2) SDC -> SD-Gluc', 
-'(47 SC.MSN2 1) SDC -> SDC', 
-'(47 SC.MSN2 1) SDC -> Tm 2.5 ug/ml'}
-fname_save = '20150408_processed_data_SC.mat';
-load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
-cmap = [1,0,0;  %Red
- 1,0.35,0; %light red
- 0,0,1;  %Blue
- 0,0.5,1;  %Light blue 
- 0,1,0; %green
- 0,1,0.5; 
- 0.2,0.2,0.2; %gray
- 0,0,0   %black
- ];  
 
-%cmap = jet(length(legend_vec_RFP));
-%perm = 1:length(legend_vec_RFP);
-perm = [1,2,3,4,5,6,7,8] ;
-N_RFP = length(perm)
-legend_vec_RFP = legend_vec_RFP(perm);
-cmap = cmap(perm,:);
-plot_params = {'linewidth',1.5,'LineStyle','-'};
-plt_grp = zeros(length(legend_vec_RFP),1);
-for jj = 1:length(perm)
-    all_tracks = all_tracks_vec{perm(jj)};
-    all_times = all_times_vec{perm(jj)};
-    color_val = cmap(jj,:);
-    plt_grp(jj) = hggroup;
-    for ph = 1: length(phases)
-        tracks = all_tracks.(phases{ph});
-        timevals = all_times.(phases{ph});
-        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
-        set(p,'Parent',plt_grp(jj))
+if make_plots == 1
+    
+    %Mean NF time traces MSN2 and MSN4 separately
+    figure(1)
+    clf
+    hold on
+    channel = 'RFP'
+    legend_vec_RFP = {'(46 SC.MSN2 1) SDC -> SD-Gluc',
+        '(46 SC.MSN2 2) SDC -> SD-Gluc',
+        '(47 SC.MSN2 1) SDC -> SD-Gluc',
+        '(47 SC.MSN2 2) SDC -> SD-Gluc',
+        '(49 SC.MSN2) SDC -> SD-Gluc',
+        '(42 SC.MSN2) SDC -> SD-Gluc',
+        '(47 SC.MSN2 1) SDC -> SDC',
+        '(47 SC.MSN2 1) SDC -> Tm 2.5 ug/ml'}
+    fname_save = '20150408_processed_data_SC.mat';
+    load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+    cmap_RFP = [1,0,0;  %Red
+        1,0.35,0; %light red
+        0,0,1;  %Blue
+        0,0.5,1;  %Light blue
+        0,1,0; %green
+        0,1,0.5;
+        0.2,0.2,0.2; %gray
+        0,0,0   %black
+        ];
+    
+    %cmap = jet(length(legend_vec_RFP));
+    %perm = 1:length(legend_vec_RFP);
+    perm = [1,2,3,4,5,6,7];
+    N_RFP = length(perm);
+    legend_vec = legend_vec_RFP(perm);
+    cmap = cmap_RFP(perm,:);
+    plot_params = {'linewidth',1.5,'LineStyle','-'};
+    plt_grp = zeros(length(legend_vec),1);
+    for jj = 1:length(perm)
+        all_tracks = all_tracks_vec{perm(jj)};
+        all_times = all_times_vec{perm(jj)};
+        color_val = cmap(jj,:);
+        plt_grp(jj) = hggroup;
+        for ph = 1: length(phases)
+            tracks = all_tracks.(phases{ph});
+            timevals = all_times.(phases{ph});
+            p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+            set(p,'Parent',plt_grp(jj))
+        end
     end
-end
-
-hleg = legend(plt_grp,legend_vec_RFP) %,'Location','NE');
-htitle = get(hleg,'Title');
-%set(htitle,'String','Condition')
-title('SC Cells, RFP Channel')
-xlabel('time')
-ylabel('Nuclear Localization')
-
-figure(2)
-clf 
-hold on
-channel = 'YFP'
-legend_vec_YFP = {'(46 SC.MSN4 1) SDC -> SD-Gluc',
-'(46 SC.MSN4 2) SDC -> SD-Gluc', 
-'(47 SC.MSN4(dzf) 1) SDC -> SD-Gluc', 
-'(47 SC.MSN4(dzf) 2) SDC -> SD-Gluc', 
-'(49 SC.MSN4(dzf)) SDC -> SD-Gluc', 
-'(42 KL.MSN2) SDC -> SD-Gluc', 
-'(47 SC.MSN4 1) SDC -> SDC', 
-'(47 SC.MSN4 1) SDC -> Tm 2.5 ug/ml'}
-fname_save = '20150408_processed_data_SC.mat';
-load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
-cmap = [1,0,0;  %Red
- 1,0.35,0; %light red
- 0,0,1;  %Blue
- 0,0.5,1;  %Light blue 
- 0,1,0; %green
- 0,1,0.5; 
- 0.2,0.2,0.2; %gray
- 0,0,0   %black
- ];  
-
-%cmap = jet(length(legend_vec_RFP));
-%perm = 1:length(legend_vec_RFP);
-perm = [1,2,3,4,5,6,7,8] ;
-legend_vec_YFP = legend_vec_YFP(perm);
-cmap = cmap(perm,:);
-plot_params = {'linewidth',1.5,'LineStyle',':'};
-plt_grp = zeros(length(legend_vec_YFP),1);
-for jj = 1:length(perm)
-    all_tracks = all_tracks_vec{perm(jj)};
-    all_times = all_times_vec{perm(jj)};
-    color_val = cmap(jj,:);
-    plt_grp(jj) = hggroup;
-    for ph = 1: length(phases)
-        tracks = all_tracks.(phases{ph});
-        timevals = all_times.(phases{ph});
-        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
-        set(p,'Parent',plt_grp(jj))
+    
+    hleg = legend(plt_grp,legend_vec); %,'Location','NE');
+    htitle = get(hleg,'Title');
+    %set(htitle,'String','Condition')
+    title('SC Cells, RFP Channel')
+    xlabel('time')
+    ylabel('Nuclear Localization')
+    
+    
+    figure(2) 
+    %Plot NF for just TM cells
+    clf
+    hold on
+    
+    %cmap = jet(length(legend_vec_RFP));
+    %perm = 1:length(legend_vec_RFP);
+    perm = [3,4,7,8]  ;
+    N_RFP = length(perm);
+    legend_vec = legend_vec_RFP(perm);
+    cmap = cmap_RFP(perm,:);
+    plot_params = {'linewidth',1.5,'LineStyle','-'};
+    plt_grp = zeros(length(legend_vec),1);
+    for jj = 1:length(perm)
+        all_tracks = all_tracks_vec{perm(jj)};
+        all_times = all_times_vec{perm(jj)};
+        color_val = cmap(jj,:);
+        plt_grp(jj) = hggroup;
+        for ph = 1: length(phases)
+            tracks = all_tracks.(phases{ph});
+            timevals = all_times.(phases{ph});
+            p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+            set(p,'Parent',plt_grp(jj))
+        end
     end
+    
+    hleg = legend(plt_grp,legend_vec); %,'Location','NE');
+    htitle = get(hleg,'Title');
+    %set(htitle,'String','Condition')
+    title('SC Cells, RFP Channel')
+    xlabel('time')
+    ylabel('Nuclear Localization')
+    
+    
+    figure(3)
+    
+    %Plot NMI for just TM cells
+    clf
+    hold on
+    
+    %cmap = jet(length(legend_vec_RFP));
+    %perm = 1:length(legend_vec_RFP);
+    perm = [3,4,7,8]  ;
+    N_RFP = length(perm);
+    legend_vec = legend_vec_RFP(perm);
+    cmap = cmap_RFP(perm,:);
+    plot_params = {'linewidth',1.5,'LineStyle','-'};
+    plt_grp = zeros(length(legend_vec),1);
+    for jj = 1:length(perm)
+        all_tracks = all_tracks_vec{perm(jj)};
+        all_times = all_times_vec{perm(jj)};
+        color_val = cmap(jj,:);
+        plt_grp(jj) = hggroup;
+        for ph = 1: length(phases)
+            tracks = all_tracks.(phases{ph});
+            timevals = all_times.(phases{ph});
+            p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nmi','plot_params',plot_params);
+            set(p,'Parent',plt_grp(jj))
+        end
+    end
+    
+    hleg = legend(plt_grp,legend_vec); %,'Location','NE');
+    htitle = get(hleg,'Title');
+    %set(htitle,'String','Condition')
+    title('SC Cells, RFP Channel')
+    xlabel('time')
+    ylabel('Median Intensity')
+    
+    
+    
+    figure(4)
+    clf
+    hold on
+    channel = 'YFP'
+    legend_vec_YFP = {'(46 SC.MSN4 1) SDC -> SD-Gluc',
+        '(46 SC.MSN4 2) SDC -> SD-Gluc',
+        '(47 SC.MSN4(dzf) 1) SDC -> SD-Gluc',
+        '(47 SC.MSN4(dzf) 2) SDC -> SD-Gluc',
+        '(49 SC.MSN4(dzf)) SDC -> SD-Gluc',
+        '(42 KL.MSN2) SDC -> SD-Gluc',
+        '(47 SC.MSN4 1) SDC -> SDC',
+        '(47 SC.MSN4 1) SDC -> Tm 2.5 ug/ml'}
+    fname_save = '20150408_processed_data_SC.mat';
+    load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+    cmap_YFP = cmap_RFP;
+    
+    %cmap = jet(length(legend_vec_RFP));
+    %perm = 1:length(legend_vec_RFP);
+    perm = [1,2,3,4,5,6,7] ;
+    legend_vec = legend_vec_YFP(perm);
+    cmap = cmap_YFP(perm,:);
+    plot_params = {'linewidth',1.5,'LineStyle','-'};
+    plt_grp = zeros(length(legend_vec),1);
+    for jj = 1:length(perm)
+        all_tracks = all_tracks_vec{perm(jj)};
+        all_times = all_times_vec{perm(jj)};
+        color_val = cmap(jj,:);
+        plt_grp(jj) = hggroup;
+        for ph = 1: length(phases)
+            tracks = all_tracks.(phases{ph});
+            timevals = all_times.(phases{ph});
+            p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+            set(p,'Parent',plt_grp(jj))
+        end
+    end
+    
+    
+    hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+    htitle = get(hleg,'Title');
+    %set(htitle,'String','Condition')
+    title('SC Cells, YFP Channel')
+    xlabel('time')
+    ylabel('Nuclear Localization')
+    %}
+    
+    %Plot NF and NMI for TM cells - MSN4
+    
+    figure(5)
+    perm = [3,4,7,8] ;
+    legend_vec = legend_vec_YFP(perm);
+    cmap = cmap_YFP(perm,:);
+    plot_params = {'linewidth',1.5,'LineStyle','-'};
+    plt_grp = zeros(length(legend_vec),1);
+    for jj = 1:length(perm)
+        all_tracks = all_tracks_vec{perm(jj)};
+        all_times = all_times_vec{perm(jj)};
+        color_val = cmap(jj,:);
+        plt_grp(jj) = hggroup;
+        for ph = 1: length(phases)
+            tracks = all_tracks.(phases{ph});
+            timevals = all_times.(phases{ph});
+            p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+            set(p,'Parent',plt_grp(jj))
+        end
+    end
+    
+    
+    hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+    htitle = get(hleg,'Title');
+    %set(htitle,'String','Condition')
+    title('SC Cells, YFP Channel')
+    xlabel('time')
+    ylabel('Nuclear Localization')
+    %}
+    
+    figure(6)
+    perm = [3,4,7,8] ;
+    legend_vec = legend_vec_YFP(perm);
+    cmap = cmap_YFP(perm,:);
+    plot_params = {'linewidth',1.5,'LineStyle','-'};
+    plt_grp = zeros(length(legend_vec),1);
+    for jj = 1:length(perm)
+        all_tracks = all_tracks_vec{perm(jj)};
+        all_times = all_times_vec{perm(jj)};
+        color_val = cmap(jj,:);
+        plt_grp(jj) = hggroup;
+        for ph = 1: length(phases)
+            tracks = all_tracks.(phases{ph});
+            timevals = all_times.(phases{ph});
+            p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nmi','plot_params',plot_params);
+            set(p,'Parent',plt_grp(jj))
+        end
+    end
+    
+    
+    hleg = legend(plt_grp,legend_vec) %,'Location','NE');
+    htitle = get(hleg,'Title');
+    %set(htitle,'String','Condition')
+    title('SC Cells, YFP Channel')
+    xlabel('time')
+    ylabel('Median Intensity')
+    %}
+    
+    
+    
+    
+    
 end
-
-
-hleg = legend(plt_grp,legend_vec_YFP) %,'Location','NE');
-htitle = get(hleg,'Title');
-%set(htitle,'String','Condition')
-title('SC Cells, YFP Channel')
-xlabel('time')
-ylabel('Nuclear Localization')
-%}
-
-
 
 return
 

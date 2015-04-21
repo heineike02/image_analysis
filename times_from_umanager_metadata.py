@@ -19,24 +19,44 @@ pos_names = os.walk(imdirbase).next()[1]
 print 'creating simplified metadata file for files in ' + imdirbase
 
 #use Directory structure to cycle through position names.
+
+#first time through take out minimal time in each position, then find the minimum time in all positions and set that as t0
+
+data = {}
+
+#set initial datetime to be greater than any datetimes from the experiment 
+t0 = datetime.now()
+t0 = t0.replace(year = t0.year + 2)
+
+#dtg format used in micromanager
+fmt = '%Y-%m-%d %H:%M:%S'
+
+
 for pos in pos_names: 
-    imdir = pos + '\\'
+    imdir = pos + os.sep
+    json_data=open(imdirbase+imdir+'metadata.txt')
+    data[pos] = json.load(json_data)
+    json_data.close()
+    #Get Initial Time and convert to datetime object also removes timezone from string since that changes and can screw things up. 
+    t0_str = data[pos]['Summary']['Time']
+    t0_str_sp = t0_str.split()
+    t0_str = t0_str_sp[0] + ' ' + t0_str_sp[1]
+    t0_new = datetime.strptime(t0_str,fmt)    
+
+    if t0_new < t0: 
+        t0 = t0_new
+        print t0, t0_new
+   
+
+for pos in pos_names: 
+    imdir = pos + os.sep
     
     parsed_data = open(imdirbase+imdir+'metadata_parsed.txt','w')
     parsed_data.write('Position\tChannel\tZstack\tFrame\tTime\n')
+
     
-    json_data=open(imdirbase+imdir+'metadata.txt')
-    data = json.load(json_data)
-    json_data.close()
-    #Get Initial Time and convert to datetime object also removes timezone from string since that changes and can screw things up. 
-    t0_str = data['Summary']['Time']
-    t0_str_sp = t0_str.split()
-    t0_str = t0_str_sp[0] + ' ' + t0_str_sp[1]
-    fmt = '%Y-%m-%d %H:%M:%S'
-    t0 = datetime.strptime(t0_str,fmt)
-    
-    nFrames = data['Summary']['Frames']
-    channels = data['Summary']['ChNames']
+    nFrames = data[pos]['Summary']['Frames']
+    channels = data[pos]['Summary']['ChNames']
     #Depth might be number of z stacks but only BF usually has z-stacks - do if/then 
     #Cycle through all channels, z-levels and frames
     
@@ -47,7 +67,7 @@ for pos in pos_names:
                     frame_name = 'FrameKey-' + str(ff) + '-' + str(ch_num) +'-' + str(zz)
                     #print frame_name
                     #parsed_data.write('Position Channel Zstack Frame Time')
-                    t1_str = data[frame_name]['Time'] 
+                    t1_str = data[pos][frame_name]['Time'] 
                     t1_str_sp = t1_str.split()
                     t1_str = t1_str_sp[0] + ' ' + t1_str_sp[1]
                     t1 = datetime.strptime(t1_str,fmt)
@@ -59,7 +79,7 @@ for pos in pos_names:
                 frame_name = 'FrameKey-' + str(ff) + '-' + str(ch_num) + '-' + str(zz)    
                 #print frame_name
                 #parsed_data.write('Position Channel Zstack Frame Time')
-                t1_str = data[frame_name]['Time'] 
+                t1_str = data[pos][frame_name]['Time'] 
                 t1_str_sp = t1_str.split()
                 t1_str = t1_str_sp[0] + ' ' + t1_str_sp[1]
                 t1 = datetime.strptime(t1_str,fmt)
