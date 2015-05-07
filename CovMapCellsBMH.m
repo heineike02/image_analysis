@@ -33,10 +33,9 @@ else
     N = length(images.(channel));
 end
 
-%N = length({images.(channel)});
 if N ~= length(time_vals)
-    'Error - times not the same size as number of images'
-    return
+    'Warning: times not the same size as number of images.  This will occur if you removed bad images from the source directory and the metadata no longer matches the number of files'
+    %return
 end
 
 
