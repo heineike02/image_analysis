@@ -1,6 +1,5 @@
-function all_tracks = BMH_20150608_deltaT_GD_first_plots()
+function all_tracks = data_plotting_template()
 %
-
 
 profile off
 ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
@@ -49,37 +48,24 @@ storeim = 1;
 %H8	t9: GD      t69: sorb
 
 
-%% Mean time traces
 
-%SC.Msn2-RFP
+%% SC.Msn2-RFP Mean Time Traces
 figure(1)
 clf
 hold on
 channel = 'RFP'
 legend_vec_RFP = {'t9: GD + sorb',
-'t9: GD',
-'t9: SDC + sorb',
-'t9: GD  t15: sorb',
-'t9: GD  t21: sorb',
-'t9: GD  t33: sorb',
-'t9: GD  t45: sorb',
-'t9: GD  t69: sorb'}
+'t9: GD'}
 
-fname_save = '20150608_processed_data_SC.mat';
+fname_save = 'example_processed_data.mat';
 load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
-cmap_RFP = [ 0.5,0.2,1; %Purple
-    0,0,1;  %Blue
+cmap_RFP = [ 0,0,1;  %Blue
     1,0,0; %Red
-    0.5,0.2,0.8; %Purple
-    0.5,0.2,0.6; %Purple
-    0.5,0.2,0.4; %Purple
-    0.5,0.2,0.2; %Purple
-    0.5,0.2,0; %Purple
- ];  
+    ];  
 
 %cmap = jet(length(legend_vec_RFP));
 %perm = 1:length(legend_vec_RFP);
-perm = [3,1,2,4,6,7,8]  ;
+perm = [1,2]  ;
 N_RFP = length(perm)
 legend_vec_RFP_plot = legend_vec_RFP(perm);
 cmap = cmap_RFP(perm,:);
@@ -101,11 +87,11 @@ end
 hleg = legend(plt_grp,legend_vec_RFP_plot) %,'Location','NE');
 htitle = get(hleg,'Title');
 %set(htitle,'String','Condition')
-title('GD and Osmo shock, varying times')
+title('GD and Osmo shock')
 xlabel('time')
 ylabel('Nuclear Localization')
 
-%KL.MSN2-YFP
+%% KL.MSN2-YFP  Mean Time Traces
 figure(2)
 clf 
 hold on
@@ -138,32 +124,27 @@ title('GD and Osmo shock, varying times')
 xlabel('time')
 ylabel('Nuclear Localization')
 
-%plot individual cells 
+
+
+%% SC.MSN2-RFP plot individual cells 
 figure(3)
 clf
 hold on
 channel = 'RFP'
 title_vec = {'t9: GD + sorb',
-'t9: GD',
-'t9: SDC + sorb',
-'t9: GD  t15: sorb',
-'t9: GD  t21: sorb',
-'t9: GD  t33: sorb',
-'t9: GD  t45: sorb',
-'t9: GD  t69: sorb'}
-
+'t9: GD'};
 
 %already loaded
 
-perm = [3,1,2,4,6,7,8] ;
-N_RFP = length(perm)
+perm = [1,2] ;
+N_RFP = length(perm);
 legend_vec_RFP = legend_vec_RFP(perm);
 cmap = cmap_RFP(perm,:);
 
 for jj = 1:length(perm)
     all_tracks = all_tracks_vec{perm(jj)};
     all_times = all_times_vec{perm(jj)};
-    subplot(2,4,jj)
+    subplot(1,2,jj)
     for ph = 1: length(phases)
         tracks = all_tracks.(phases{ph});
         timevals = all_times.(phases{ph});
@@ -172,3 +153,5 @@ for jj = 1:length(perm)
     axis([0,100,0,10])
     title(title_vec{jj})
 end
+
+

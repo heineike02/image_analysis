@@ -25,8 +25,28 @@ Use bright field to find cells and collect cell size
 Spot cells with bright field
 Collect Cell Size
 
+For tracking adjust for final image shifts??
+
 Filter out cells outside of a certain size range
 
 make immune to os (use filesep) and computer (TrackIDL doesn't take ipdir argument)
+
+Error handling for when no cells are detected.
+
+To Do: 
+
+Add information about circle files.  
+storeim - is it necessary? 
+- test std_thresh against nuclear localization
+
+%Tracking parameters
+%estimated maximum number of tracks
+
+Are these even used? max_shift_rad
+min_dist_thresh 
+
+Test this vs new routine. %[maxx,maxy]=FindMaximaBMH(ima,px,py,close_max);
+
+
 
 
