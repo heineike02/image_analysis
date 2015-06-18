@@ -1,4 +1,4 @@
-function all_tracks = BMH_20150603_GD_Osmo_strains_42_76_MSN2()
+function all_tracks = BMH_20150604_osmo_then_GD_varied_GD()
 %
 
 profile off
@@ -16,7 +16,7 @@ fname_conv = 'Micromanager'
 %imdirPhase.Pre = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_pre_1\'
 %imdirPhase.Post = 'C:\Users\Ben\Documents\Data\PKA_Project\20140123\10_27_28_GD_GA_post_1\'
 
-base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20150603_GD_Osmo_strains_42_76\'
+base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20150604_osmo_then_GD_varied_GD\'
 imdirPhase.Pre = [base_dir,'Pre',filesep]
 imdirPhase.Post = [base_dir,'Post',filesep]
 %imdirPhase.Post_p2 = [base_dir,'Post_p2\']
@@ -31,12 +31,12 @@ channels = {'BF','RFP','YFP'}
 channel_to_image = {'RFP','YFP'}  %if this is just one channel just list it as a text variable i.e. 'RFP'. 
 %channel_to_image = 'RFP'
 
-fname_saveSP.SC = '20150603_processed_data_SC_MSN2.mat';
+fname_saveSP.SC = '20150604_processed_data_SC.mat';
 %fname_saveSP.KL = '20141210_processed_data_KL.mat';
 %fname_saveSP.SC = '20140703_processed_data_SC.mat'; 
 
-phases =  {'Pre','Post'}%,'Post_p2'} %,'Post'} 
-shift_timing = [0,12]    
+phases =  {'Pre', 'Post'}%,'Post_p2'} %,'Post'} 
+shift_timing = [0,48]    
 %These are the absolute times at which each phase starts.
 %timestep method
 %time_calc:  Tells the program how to calculate each time value.  If the
@@ -130,23 +130,23 @@ else
         imbg.(ch2i_txt) = imbg_jj;
     end
 end
+
 %all locations had 4 sites
-%Initial Glucose dropout 0.08. 
-%osmo balanced with sorbitol 
-% Strain 42 has SC.MSN2-YFP and KL.MSN2-RFP
-% Strain 76 has Hog1-RFP
+%Osmo shock of 0.35M followed by varying glucose dropout levels
+%osmo balanced with sorbitol relative to osmotic stress condition.
+%
+%
+%A7	t9: SDC	    t45: GD 0.7% 
+%B7	t9: Osmo	t45: GD 0.7% 
+%C7	t9: SDC		t45: GD 0.37%
+%D7	t9: Osmo	t45: GD 0.37%
+%E7	t9: SDC     t45: GD 0.1% 
+%F7	t9: Osmo    t45: GD 0.1% 
+%G7	t9: SDC     t45: GD 0.01% 
+%H7	t9: Osmo	t45: GD 0.01% 
 
-%A6	Strain 42 t0  GD 0.25M Sorb t21
-%B5	Strain 42 t0 SDC 0.25M Sorb t21
-%C5	Strain 76 t0  GD 0.25M Sorb t21
-%D5	Strain 76 t0 SDC 0.25M Sorb t21
-%E5	Strain 42 t0  GD 0.25M Sorb t36
-%F5	Strain 42 t0 SDC 0.25M Sorb t36
-%G5	Strain 76 t0  GD 0.25M Sorb t36
-%H5	Strain 76 t0 SDC 0.25M Sorb t36
 
-
-wellvecSP.SC = {'A6','B6','E6','F6'};
+wellvecSP.SC = {'A7','B7','C7','D7','E7','F7','G7','H7'};
 wellvecSP.KL = {};
 Nsites = 4;
 
@@ -163,8 +163,8 @@ end
 
 %bad data
 %e.g.
-%Removed A6 site1 
-posvecSP.SC{1,2} = 'NA'
+%Removed A1 site1 
+%posvecSP.SC{1,2} = 'NA'
 
 
 

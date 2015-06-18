@@ -31,7 +31,7 @@ channels = {'BF','RFP','YFP'}
 %channel_to_image = {'RFP','YFP'}  %if this is just one channel just list it as a text variable i.e. 'RFP'. 
 channel_to_image = 'RFP'
 
-fname_saveSP.SC = '20150602_processed_data_SC_HOG1.mat';
+fname_saveSP.SC = '20150603_processed_data_SC_HOG1.mat';
 %fname_saveSP.KL = '20141210_processed_data_KL.mat';
 %fname_saveSP.SC = '20140703_processed_data_SC.mat'; 
 
