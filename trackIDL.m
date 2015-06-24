@@ -25,7 +25,7 @@ param.quiet = 0;
 
 nFrames = length(timecoursedata);
 
-
+%If there are two channels of data being collected
 if isstruct(timecoursedata(1).celldata(1).Cxloc)
 %if isstruct() && strcmp('Combined',timecoursedata_fields{3})
     timecoursedata_fields = fields(timecoursedata(1).celldata(1).Cxloc);
@@ -95,7 +95,7 @@ for jj = 1:length(timecoursedata)
         xyzs(mm,2) = celldata(kk).Cyloc;
         xyzs(mm,3) = celldata(kk).nf;
         xyzs(mm,4) = celldata(kk).nmi;
-        xyzs(mm,5) = times(jj);
+        xyzs(mm,5) = time_inds(jj);
         mm = mm + 1;
     end
 end

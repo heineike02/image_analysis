@@ -42,9 +42,9 @@ imdirPhase.Exp = base_dir;
 
 load([ipdir, 'circSC_60x_4x4.mat'])
 circ_out = circ;
-siz = [16,16];
-rad = 8;
-std_thresh = 0.2;
+siz = [12,12];
+rad = 7;
+std_thresh = 0.05;
 maxdisp = 2;
 
 % image of typical cell
@@ -98,7 +98,9 @@ analysis_params.channels = {'YFP'};
 channel_to_image = 'GFP';  
 analysis_params.channel_to_image = channel_to_image;
 
-fname_save = 'example_processed_data.mat';
+%appends this onto base_dir - right now base_dir has a bit of a filename on it
+%as well. 
+fname_save = 'processed_data.mat';
 
 
 %% timestep method
