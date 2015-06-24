@@ -9,7 +9,7 @@ ipdir = track_params.ipdir;
 
 %adds IDL Track function to path
 %Windows
-path(path,[ipdir,'IDL_Particle_Tracking']);
+path([ipdir,'IDL_Particle_Tracking'],path);
 
 %See track documentation for more info on these parameters
 param.mem = track_memory;

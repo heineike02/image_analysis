@@ -1,4 +1,4 @@
-function [circ, siz, rad, maxdisp, max_shift_rad, min_dist_thresh, std_thresh] = species_magnification_params(species, op_amp, ipdir, maxdisp_1x)
+function [circ, siz, rad, maxdisp, std_thresh] = species_magnification_params(species, op_amp, ipdir, maxdisp_1x)
 %circ_params: gives parameters for input into time_series_analysis based on
 %species and microscope optical amplification.  
 %
