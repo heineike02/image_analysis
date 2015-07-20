@@ -5,7 +5,7 @@ function all_tracks = image_processing_template()
 %% Inputs
 
 %image processing directory
-ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
+ipdir = 'C:\Users\susanychen\GitHub\image_analysis\'
 %adds image analysis directory to path 
 path(ipdir,path)
 analysis_params.ipdir = ipdir;
@@ -14,14 +14,14 @@ analysis_params.ipdir = ipdir;
 % 'JSO','Micromanager', or 'HCS_Nikon'
 % For example of Micromanager filename convention see BMH_20140127 analysis
 % files
-fname_conv = 'Micromanager';
+fname_conv = 'JSO';
 analysis_params.fname_conv = fname_conv;
 
 % ?? doublecheck this
 analysis_params.storeim = 1;
 
 %Base directory for image files
-base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20150608_deltaT_GD_first\'
+base_dir = '\\elsamad.ucsf.edu\Data\Instrumentation\microscope\SYC\20150710_PhosphateDeplet_ASOE_TRpanel\'
 %filenames for each phase of imaging.  If only one phase of imaging code
 %will still work - this basically is the directory that Micromanager uses
 %to store all image files from a certain set of images. 
@@ -31,12 +31,12 @@ base_dir = 'C:\Users\Ben\Documents\Data\PKA_project\20150608_deltaT_GD_first\'
 %imdirPhase.Exp = [base_dir,'Exp',filesep]
 %
 
-phases =  {'Pre', 'Post'}%,'Post_p2'} %,'Post'} 
+phases =  {'Pre'};%, 'Post'}%,'Post_p2'} %,'Post'} 
 %These are the absolute times at which each phase starts.
-shift_timing = [0,12.5]    
+shift_timing = [0];%[0,12.5]    
 
-imdirPhase.Pre = [base_dir,'Pre',filesep]
-imdirPhase.Post = [base_dir,'Post',filesep]
+imdirPhase.Pre = [base_dir,'before_phosphateDeplet',filesep]
+%imdirPhase.Post = [base_dir,'Post',filesep]
 
 
 % optical amplification 
@@ -95,13 +95,17 @@ analysis_params.min_points_for_traj = 4;
 %std thresh for calling a peak to find a cell
 analysis_params.std_thresh = std_thresh;
 
+%thresh for identifying cell locations after deconvlucy
+analysis_params.thresh = 2; % standard for S. cerevisiae is 2
+
 %total number of channels of images taken
-analysis_params.channels = {'BF','RFP','YFP'};
+%analysis_params.channels = {'BF','RFP','YFP'};
+analysis_params.channels = {'RFP'};
 
 %Channels we want to process images from.
 %If two channels, use a cell.  If just one channel just list it as a text variable i.e. 'RFP'. 
-%channel_to_image = 'RFP'
-channel_to_image = {'RFP','YFP'};  
+channel_to_image = 'RFP'
+%channel_to_image = {'RFP','YFP'};  
 analysis_params.channel_to_image = channel_to_image;
 
 fname_save = 'example_processed_data.mat';
@@ -113,7 +117,7 @@ fname_save = 'example_processed_data.mat';
 %If the input is a filename, then that is interpreted as metadata that gives
 %exact time values.  
 
-%time_calc_phase.Pre = 5
+time_calc_phase.Pre = 2 %minutes
 %time_calc_phase.Post = 4
 %time_calc_phase.Pre = [imdirPhase.Pre, 'acqdat.txt']
 %time_calc_phase.Post = [imdirPhase.Post, 'acqdat.txt']
@@ -131,8 +135,8 @@ if generate_metadata_parsed ==1;
           system(['python ', metadata_conv_fname, ' ', imdir])
     end
 end
-time_calc_phase.Pre =  'metadata_parsed.txt';
-time_calc_phase.Post = 'metadata_parsed.txt';
+%time_calc_phase.Pre =  'metadata_parsed.txt';
+%time_calc_phase.Post = 'metadata_parsed.txt';
 %time_calc_phase.Post_p2 = 'metadata_parsed.txt';
 
 
@@ -141,7 +145,7 @@ time_calc_phase.Post = 'metadata_parsed.txt';
 
 %% Background image
 
-bgimg = 1; 
+bgimg = 0; 
 %1 if you have a background image, 0 if you don't. 
 %Gets background image depending on channel to image
 %Collect background images using micromanager 
@@ -211,15 +215,16 @@ analysis_params.imbg = imbg;
 %G8	t9: GD      t45: sorb
 %H8	t9: GD      t69: sorb
 
+% constructing posvec for Micromanager experiment
+% wellvec = {'A9','B9'} %,'C9','D9','E9','F9','G9','H9'};
+% Nsites = 4;
+% Nwells = length(wellvec);
+% for jj = 1:length(wellvec);
+%     for kk = 1:Nsites;
+%         posvec{jj,kk} = [wellvec{jj},'-Site_',num2str(kk-1)];
+%     end
+% end
 
-wellvec = {'A9','B9'} %,'C9','D9','E9','F9','G9','H9'};
-Nsites = 4;
-
-for jj = 1:length(wellvec);
-    for kk = 1:Nsites;
-        posvec{jj,kk} = [wellvec{jj},'-Site_',num2str(kk-1)];
-    end
-end
 
 %Remove various sites from list 
 
@@ -237,19 +242,21 @@ end
 
 % Using JSO's matlab image code, the folder names are different - here is
 % an example of the position vector in that case
-% posvec = {'p1','p2','p3';
+posvec = {'p1','p2';
+    'p3','p4'};
 % 'p6','p7','p8';
 % 'p11','p12','p13';
 % 'p16','p17','p18';
 % 'p21','p22','p23';
 % 'p26','p27','p28'};
+Nwells = size(posvec,1);
 
 %Obtain and store data for each dose 
 
 all_tracks_vec = [];
 all_times_vec = [];
 posvec 
-for jj = 1:length(wellvec)
+for jj = 1:Nwells
    for ph = 1:length(phases);
         phase = phases{ph};
         analysis_params.imdir = imdirPhase.(phase);
