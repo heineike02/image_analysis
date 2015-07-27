@@ -3,6 +3,7 @@ function [circ, siz, rad, maxdisp, std_thresh] = species_magnification_params(sp
 %species and microscope optical amplification.  
 %
 %STD thresh:  Previously 0.2 worked well for SC images.  0.16 seemed to work best for k.lactis on 16JUL images
+%May just want to change this to output circ filename.
 
 if strcmp(op_amp,'1x')
     multiplier = 1.0;
@@ -24,18 +25,18 @@ if strcmp(op_amp,'1x')
         'Error - incorrect species name'
     end
     
-elseif strcmp(op_amp,'1.5x')
+elseif strcmp(op_amp,'1p5x')
     multiplier = 1.5;
     if strcmp(species,'KL')
         %load image of KLactis cell - this was made in BMH_20130916_analysis_klac.m
-        load([ipdir, 'circKL_15x.mat'])
+        load([ipdir, 'circKL_1p5x.mat'])
         circ_out = circ;
         siz = [18,18];
         rad = 8;
         std_thresh = 0.16;
     elseif strcmp(species,'SC')
         %load image of S.Cerevisiae cell (made by Jacob)
-        load([ipdir,'circSC_15x.mat'])
+        load([ipdir,'circSC_1p5x.mat'])
         circ_out = circ;
         siz = [25,25];
         rad = 11;
