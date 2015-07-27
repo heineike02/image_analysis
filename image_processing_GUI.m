@@ -790,6 +790,7 @@ phases = handles.phases;
 time_calc_phase = handles.time_calc_phase;
 imdir_phase = handles.imdir_phase;
 shift_timing = handles.shift_timing;
+base_dir = handles.base_dir;
 fname_save = handles.fname_save;
 
 for jj = 1:Nwells
@@ -809,6 +810,7 @@ for jj = 1:Nwells
    all_times_vec{jj} = all_times;
 end
 %store data
+
 save([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
 
 %guidata(hObject, handles)
@@ -832,7 +834,11 @@ handles.imdir_phase = imdir_phase;
 handles.shift_timing = [phase_table_data{3,1:Nphases}];
 
 for jj = 1:length(phases);
-    time_calc_phase.(phases{jj})=phase_table_data{4,jj};
+    time_calc_phase_jj = phase_table_data{4,jj};
+    if regexpi(time_calc_phase_jj, '\d+');
+        time_calc_phase_jj = str2num(time_calc_phase_jj);
+    end
+    time_calc_phase.(phases{jj})=time_calc_phase_jj;
 end
 handles.time_calc_phase = time_calc_phase;
 
