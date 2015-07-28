@@ -777,7 +777,7 @@ end
 
 %convert single channel to text from cell
 channel_to_image = analysis_params.channel_to_image;
-if  (iscell(channel_to_image)&length(channel_to_image)) == 1
+if  ( iscell(channel_to_image) & (length(channel_to_image)==1) )
     channel_to_image = channel_to_image{1};
     analysis_params.channel_to_image = channel_to_image;
 end
