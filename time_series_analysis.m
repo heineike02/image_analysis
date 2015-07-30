@@ -27,7 +27,7 @@ std_thresh = analysis_params.std_thresh;
 thresh = analysis_params.thresh;
 pos_fnames = analysis_params.pos_fnames;
 channels = analysis_params.channels;
-channel_to_image = analysis_params.channel_to_image;
+channels_to_image = analysis_params.channels_to_image;
 time_calc = analysis_params.time_calc;
 imbg = analysis_params.imbg;
 maxcells = analysis_params.maxcells;
@@ -40,37 +40,35 @@ Nchan = length(channels);
 for nn = 1:positions
     pos_fnames_nn = pos_fnames{nn};
     
-    if length(channel_to_image) == 2
-        channels_to_image = channel_to_image;
-        for ch = 1:length(channels_to_image)
-            channel_to_image = channels_to_image{ch};
-            %get filenames and put them into a strucure
-            images0 = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
-            
-            images.(channel_to_image) = images0.(channel_to_image);
-            %get times
-            [time_inds, time_valsCH.(channel_to_image)] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
-            %time_inds should be the same - time vals might be slightly
-            %different
-        end
-
-        %Make average time value for all channels at one position and time
-        time_vals = zeros(size(time_valsCH.(channels_to_image{1})));
-        for ch = 1:length(channels_to_image)
-            time_vals = time_vals + time_valsCH.(channels_to_image{ch});
-        end
-        time_vals = time_vals/length(channels_to_image);
-        channel_to_image = channels_to_image; %convert back to cell so that subsequent subroutines recognize there are two channels. 
-        
-    else 
-               
+    for ch = 1:length(channels_to_image)
+        channel_to_image = channels_to_image{ch};
         %get filenames and put them into a strucure
-        images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
-    
+        images0 = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
+
+        images.(channel_to_image) = images0.(channel_to_image);
         %get times
-        [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
-    
+        [time_inds, time_valsCH.(channel_to_image)] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
+        %time_inds should be the same - time vals might be slightly
+        %different
     end
+
+    %Make average time value for all channels at one position and time
+    time_vals = zeros(size(time_valsCH.(channels_to_image{1})));
+    for ch = 1:length(channels_to_image)
+        time_vals = time_vals + time_valsCH.(channels_to_image{ch});
+    end
+    time_vals = time_vals/length(channels_to_image);
+     
+
+%     else 
+%                
+%         %get filenames and put them into a strucure
+%         images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
+%     
+%         %get times
+%         [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
+%     
+%     end
     %get tracks
 
     cell_find_params.circ = circ;
@@ -90,7 +88,7 @@ for nn = 1:positions
     cell_find_params.edge_margin = analysis_params.edge_margin;
 
 
-    timecoursedata = CovMapCells(imdir, images, time_vals, channel_to_image, cell_find_params);
+    timecoursedata = CovMapCells(imdir, images, time_vals, channels_to_image, cell_find_params);
     
     track_params.time_inds = time_inds;
     track_params.maxdisp = maxdisp;
@@ -116,60 +114,60 @@ for nn = 1:positions
     %Starting point if you just want graphs
     %tracks = tracks_vec(nn).tracks;
 
-    plot_each_pos = 0;
-
-    if plot_each_pos == 1
-        nTracks = length(tracks);
-        figure(1)  
-        im = imread([imdir,images(1).(channel_to_image)]); 
-        %subplot(2,2,nn)
-        hold all
-        imagesc(im)
-        %imshow(im);
-
-        for jj = 1:nTracks
-            x_vec = [tracks(jj).Cxloc];
-            y_vec = [tracks(jj).Cyloc];
-            %imagesc seems to flip the axes
-            plot(y_vec,x_vec,'LineWidth',3)
-        end
-
-        [mean_nf, std_nf] = nf_calcs(time_vals,tracks)
-
-        figure(2)
-        %subplot(2,2,nn)
-        hold all
-        for jj = 1:nTracks
-            nf_vec = [tracks(jj).nf];
-            t_vec = [tracks(jj).times];
-            plot(t_vec,nf_vec)
-        end
-
-
-
-
-        plot(time_vals,mean_nf, 'k','LineWidth', 3)
-        xlabel('time (m)')
-        ylabel('Nuclear Localization')
-        axis([0,110,1.0,5])
-
-
-        figure(3)
-        %subplot(2,2,nn)
-        hold on
-        errorbar(time_vals,mean_nf,std_nf)
-        xlabel('time (m)')
-        ylabel('Nuclear Localization')
-        axis([0,50,1.0,5])
-
-        figure(4)
-        hold on;
-        alpha = 0.2;
-        acolor = 'c';
-        fill([time_vals fliplr(time_vals)],[mean_nf'+std_nf' fliplr(mean_nf'-std_nf')],acolor, 'FaceAlpha', alpha,'linestyle','none');
-        plot(time_vals,mean_nf,acolor,'linewidth',1.5); % change color or linewidth to adjust mean line
-
-    end
+%     plot_each_pos = 0;
+% 
+%     if plot_each_pos == 1
+%         nTracks = length(tracks);
+%         figure(1)  
+%         im = imread([imdir,images(1).(channel_to_image)]); 
+%         %subplot(2,2,nn)
+%         hold all
+%         imagesc(im)
+%         %imshow(im);
+% 
+%         for jj = 1:nTracks
+%             x_vec = [tracks(jj).Cxloc];
+%             y_vec = [tracks(jj).Cyloc];
+%             %imagesc seems to flip the axes
+%             plot(y_vec,x_vec,'LineWidth',3)
+%         end
+% 
+%         [mean_nf, std_nf] = nf_calcs(time_vals,tracks)
+% 
+%         figure(2)
+%         %subplot(2,2,nn)
+%         hold all
+%         for jj = 1:nTracks
+%             nf_vec = [tracks(jj).nf];
+%             t_vec = [tracks(jj).times];
+%             plot(t_vec,nf_vec)
+%         end
+% 
+% 
+% 
+% 
+%         plot(time_vals,mean_nf, 'k','LineWidth', 3)
+%         xlabel('time (m)')
+%         ylabel('Nuclear Localization')
+%         axis([0,110,1.0,5])
+% 
+% 
+%         figure(3)
+%         %subplot(2,2,nn)
+%         hold on
+%         errorbar(time_vals,mean_nf,std_nf)
+%         xlabel('time (m)')
+%         ylabel('Nuclear Localization')
+%         axis([0,50,1.0,5])
+% 
+%         figure(4)
+%         hold on;
+%         alpha = 0.2;
+%         acolor = 'c';
+%         fill([time_vals fliplr(time_vals)],[mean_nf'+std_nf' fliplr(mean_nf'-std_nf')],acolor, 'FaceAlpha', alpha,'linestyle','none');
+%         plot(time_vals,mean_nf,acolor,'linewidth',1.5); % change color or linewidth to adjust mean line
+% 
+%     end
 
 end
 

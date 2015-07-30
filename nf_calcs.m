@@ -9,11 +9,7 @@ for kk = 1:nTimes
     nf_vec = zeros(nTracks,1);
     for jj = 1:nTracks
         track_times = [tracks(jj).times];
-        if isempty(channel)
-            track_nfs = [tracks(jj).nf];
-        else
-            track_nfs = [tracks(jj).nf.(channel)];
-        end
+        track_nfs = [tracks(jj).nf.(channel)];
         time_match = (track_times==timeval);
         if sum(time_match) ~= 0
             nf_vec(jj) = track_nfs(time_match);

@@ -553,7 +553,7 @@ function min_points_for_traj_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of min_points_for_traj as text
 %        str2double(get(hObject,'String')) returns contents of min_points_for_traj as a double
-handles.min_points_for_traj = str2double(get(hObject,'String'));
+%handles.min_points_for_traj = str2double(get(hObject,'String'));
 guidata(hObject, handles)
 
 % --- Executes during object creation, after setting all properties.
@@ -651,16 +651,16 @@ function load_bg_image_Callback(hObject, eventdata, handles)
 
 %convert everything to handles
 bgimg = get(handles.bgimg,'Value');
-channel_to_image = handles.channel_to_image;
+channels_to_image = handles.channels_to_image;
 if bgimg == 0  %set default to 1
-    for jj = 1:length(channel_to_image)
+    for jj = 1:length(channels_to_image)
         %ch2i_txt = ch2i{jj}
-        imbg.(channel_to_image{jj}) = 1;
+        imbg.(channels_to_image{jj}) = 1;
     end
     
 else
-    for jj = 1:length(channel_to_image)
-        imbg_jj = imread(handles.imbg_fname.(channel_to_image{jj}));
+    for jj = 1:length(channels_to_image)
+        imbg_jj = imread(handles.imbg_fname.(channels_to_image{jj}));
            
         if strcmp(handles.fname_conv,'JSO')
             imbg_jj = imbg_jj';  %micromanager images are the inverse of images collected by JSO image collection scripts.
@@ -674,7 +674,7 @@ else
         %on the edges.  For these background images symmetric BCs is a good
         %assumption
         imbg_jj = medfilt2(imbg_jj,[coarse_smooth,coarse_smooth],'symmetric');
-        imbg.(channel_to_image{jj}) = imbg_jj;
+        imbg.(channels_to_image{jj}) = imbg_jj;
     end
 end
 
@@ -768,19 +768,19 @@ analysis_params_names = {'ipdir',
     'std_thresh',
     'thresh',
     'channels',
-    'channel_to_image',
+    'channels_to_image',
     'imbg'};
 
 for jj = 1:length(analysis_params_names)
     analysis_params.(analysis_params_names{jj}) = handles.(analysis_params_names{jj});
 end
 
-%convert single channel to text from cell
-channel_to_image = analysis_params.channel_to_image;
-if  ( iscell(channel_to_image) & (length(channel_to_image)==1) )
-    channel_to_image = channel_to_image{1};
-    analysis_params.channel_to_image = channel_to_image;
-end
+% %convert single channel to text from cell
+% channels_to_image = analysis_params.channels_to_image;
+% if  ( iscell(channels_to_image) & (length(channels_to_image)==1) )
+%     channels_to_image = channels_to_image{1};
+%     analysis_params.channels_to_image = channels_to_image;
+% end
 
 all_tracks_vec = [];
 all_times_vec = [];
@@ -900,22 +900,22 @@ channel_table_data =  get(handles.channel_table,'Data');
 Nchan = find(1-strcmp('',{channel_table_data{:,1}}), 1, 'last' );
 channels = {channel_table_data{1:Nchan,1}};
 handles.channels = channels;
-channel_to_image_ind_vec = strcmp('True',{channel_table_data{1:Nchan,2}});
-channel_to_image = channels(channel_to_image_ind_vec);
+channels_to_image_ind_vec = strcmp('True',{channel_table_data{1:Nchan,2}});
+channels_to_image = channels(channels_to_image_ind_vec);
 
-channel_to_image_ind = find(channel_to_image_ind_vec);
-for jj = 1:length(channel_to_image)
-    handles.imbg_fname.(channel_to_image{jj}) = [handles.base_dir,'BG',filesep,channel_table_data{channel_to_image_ind(jj),3}];
+channels_to_image_ind = find(channels_to_image_ind_vec);
+for jj = 1:length(channels_to_image)
+    handles.imbg_fname.(channels_to_image{jj}) = [handles.base_dir,'BG',filesep,channel_table_data{channels_to_image_ind(jj),3}];
 end
 
-%if length(channel_to_image) == 1
-%    channel_to_image = channel_to_image(1); %if only imaging one channel converts cell to text string 
+%if length(channels_to_image) == 1
+%    channels_to_image = channels_to_image(1); %if only imaging one channel converts cell to text string 
 %end
 
-handles.channel_to_image = channel_to_image;
+handles.channels_to_image = channels_to_image;
 
 handles.channels
-handles.channel_to_image
+handles.channels_to_image
 handles.imbg_fname
 'Channel data loaded'
 

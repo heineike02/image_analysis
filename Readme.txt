@@ -47,6 +47,9 @@ min_dist_thresh
 
 Test this vs new routine. %[maxx,maxy]=FindMaximaBMH(ima,px,py,close_max);
 
+- Option to forego tracking - just get parameters for each frame. 
+- Tracking should be able to follow big frame shifts - perhaps there is some recentering/computer vision algorithm we can run. 
 
+C:\Users\Ben\Documents\Data\PKA_project\20150727_EW050_62_70_check_GD\
 
-
+processed_data_50_maxdisp1_mintraj1.mat

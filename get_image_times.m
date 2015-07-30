@@ -1,4 +1,4 @@
-function [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
+function [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc)
 %time_calc:  Tells the program how to calculate each time value.  If the
 %input is a number, then that is interpreted as a dt between images.  If
 %the input is a filename, then that is interpreted as metadata that gives
@@ -29,8 +29,8 @@ elseif ischar(time_calc)
             time = str2double(metadata{metadata_ind}{1})/60.0; %in minutes
             time_vals(jj) = time;
        end
-   elseif strcmp(fname_conv,'Micromanager')
-       [~,Channel,~,Frame,Time] =  import_metadata_parsed([imdir,pos_fnames_nn,'\',time_calc]);
+elseif strcmp(fname_conv,'Micromanager')
+       [~,Channel,~,Frame,Time] =  import_metadata_parsed([imdir,pos_fnames_nn,filesep,time_calc]);
        chan_ind = strcmp(Channel,channel_to_image);
        time_vals = Time(chan_ind);
        
