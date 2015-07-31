@@ -38,7 +38,8 @@ positions = length(pos_fnames);
 Nchan = length(channels);
 
 for nn = 1:positions
-    pos_fnames_nn = pos_fnames{nn};
+    thePos = nn % TEST
+    pos_fnames_nn = pos_fnames{nn}; % looping through each field of view
     
     if length(channel_to_image) == 2
         channels_to_image = channel_to_image;
@@ -64,11 +65,11 @@ for nn = 1:positions
         
     else 
                
-        %get filenames and put them into a strucure
-        images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
+        %get filenames for 1 FOV and put them into a strucure
+        images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan); 
     
         %get times
-        [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
+        [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc); % this is just for 1 position
     
     end
     %get tracks
