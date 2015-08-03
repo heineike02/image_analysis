@@ -46,7 +46,7 @@ hold on
 
 channel = 'RFP'
 legend_vec_RFP = {'BMH42','EW50 1','EW50 2'}
-cmap_RFP = [ 0,0,1;  %Black
+cmap_RFP = [ 0,0,0;  %Black
     1,0,0;  %Red
     0.5,0,0 %Light Red
         ];  

@@ -47,9 +47,18 @@ min_dist_thresh
 
 Test this vs new routine. %[maxx,maxy]=FindMaximaBMH(ima,px,py,close_max);
 
-- Option to forego tracking - just get parameters for each frame. 
-- Tracking should be able to follow big frame shifts - perhaps there is some recentering/computer vision algorithm we can run. 
 
-C:\Users\Ben\Documents\Data\PKA_project\20150727_EW050_62_70_check_GD\
+match_two_channels_Hung: 
+%Make this function handle a situation where no cells are detected.
 
-processed_data_50_maxdisp1_mintraj1.mat
+Noticed after implementing single channel / double channel functionality with cells as a channel (~7/30/2015) that a combinatorics error in the tracking began to 
+occur.  
+
+Test: run with and without changes and save xyzs from right before tracking.  
+
+Why does load BG image take so long? 
+
+
+
+
+
