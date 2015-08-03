@@ -85,7 +85,7 @@ for jj = 1:N
                     celldata_new(mm).(celldata_fields{kk}).(channel) = celldata.(channel)(mm).(celldata_fields{kk});
                 end
             celldata_new(mm).Cxloc.Combined = celldata_new(mm).Cxloc.(channel); 
-            celldata_new(mm).Cyloc.Combined = celldata_new(mm).Cxloc.(channel);
+            celldata_new(mm).Cyloc.Combined = celldata_new(mm).Cyloc.(channel);
         end 
         celldata = celldata_new;
     else
