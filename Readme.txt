@@ -51,12 +51,15 @@ Test this vs new routine. %[maxx,maxy]=FindMaximaBMH(ima,px,py,close_max);
 match_two_channels_Hung: 
 %Make this function handle a situation where no cells are detected.
 
-Noticed after implementing single channel / double channel functionality with cells as a channel (~7/30/2015) that a combinatorics error in the tracking began to 
-occur.  
+Center cells before using STD thresh
 
-Test: run with and without changes and save xyzs from right before tracking.  
+Remove duplicates in first findmaxima call
 
-Why does load BG image take so long? 
+Remove duplicates with the same nf and nmi? 
+
+make good 2 clolor test set.
+
+
 
 
 
