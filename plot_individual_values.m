@@ -1,4 +1,4 @@
-function fig_out = plot_individual_values(timevals,tracks,channel,val_to_plot,varargin)
+function [fig_out] = plot_individual_values(timevals,tracks,channel,val_to_plot,varargin)
 
 hold all
 xlabel('time(min)')
