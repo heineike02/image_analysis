@@ -1192,6 +1192,7 @@ function populate_pos_table_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% populates microwell position table for Micromanager images
 Nsites = str2double(get(handles.Nsites,'String'));
 wellvec = get(handles.well_list,'Data');
 wellvec = wellvec(not(strcmp('',wellvec)));
