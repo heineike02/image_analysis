@@ -1,63 +1,69 @@
-BMH code for image analysis as of 17JUL2013
+HES Lab code for image analysis as of 20150807
 based on JSO code for image analysis as of 12/12/12
 
--->designed for analysis of images collected by JSO microscope scripts and micromanager
+1. Designed for cell finding, nuclear intensity and localization analysis of images collected by JSO microscope scripts, micromanager, and metamorph. 
 
--->to see some examples of data analysis look in the BMH_data_analysis files
+2. Nuclear localization based on ratio of top 5 pixels to median nuclear intensity (Ref. JSO BPAC paper, Elowitz?)
 
---> (1)CovMapCellsBMH -- takes image series from microscope, finds cells in each image
-	(2)trackIDL_BMH replaces AlignCellsIMCT -- takes cell list from CovMapCell, constructs full cell traces
--also see aligncell, aligncellsIM, aligncellsKmeans (all functional but some tradeoffs, IMCT is probably the best although slowest overall)
+3. The code is kept in the image_processing.git repository on the HES lab server.  
 
+4. Image Processing: 
+	a. Processed image data for each sample (can be multiple fields of view) in an experiment is stored in a cell called all_tracks_vec, with a corresponding all_times_vec in which times for that well are stored.  posvec contains a cell array with the directory prefixes for all fields of view and image sets processed.  
+	b. Run from gui: Open up the image_processing_GUI.m gui file and run it.  
+	c. To run from a script use the image_processing_template.m from the BMH_data_analysis file. 
+
+	Key functions: 
+	(1)FindCells.m  -- finds individual cells in a particular image, calculates nuclear localization (nf) and median nuclear intensity (nmi). 
+	(2)CovMapCells.m -- wrapper for analyzing data from a set of images from the same movie. 
+	(3)trackIDL.m -- finds tracks for each cell.  
+	(4)time_series_analysis.m -- wrapper to generate tracks for cells a set of movies from the same continuous experiment.  
+	
 Contact BMH if problems occur (heineike02@gmail.com)
 Original version (1.0) created by JSO (JacobStewartOrnstein@gmail.com)
 
 archive contains version 1.0 files that were not replaced in new version, but which were not necessary
 
-use BMH_data_analysis/BMH_20140304_analysis_KL_vs_SC.m as an example (has updated file structure).
-
 Git notes: repository ignores any image files (eg background images) to get those look at the original files on the FTP server under Resources/script
 
-Desired features to add: 
-Change image collectioncode output to sort in image order (01 v.s. 1 in filename), then adjust that within this structure. 
-
-Use bright field to find cells and collect cell size
-Spot cells with bright field
-Collect Cell Size
-
-For tracking adjust for final image shifts??
-
-Filter out cells outside of a certain size range
-
-make immune to os (use filesep) and computer (TrackIDL doesn't take ipdir argument)
-
-Error handling for when no cells are detected.
-
-To Do: 
-
-Add information about circle files.  
-storeim - is it necessary? 
-- test std_thresh against nuclear localization
-
-%Tracking parameters
-%estimated maximum number of tracks
-
-Are these even used? max_shift_rad
-min_dist_thresh 
-
-Test this vs new routine. %[maxx,maxy]=FindMaximaBMH(ima,px,py,close_max);
 
 
-match_two_channels_Hung: 
-%Make this function handle a situation where no cells are detected.
+To do list: 
+- Create a test image and some testing code to validate findCells
 
-Center cells before using STD thresh
+- Find Cells: 
+	- Troubleshoot overabundance of identified cells
+	- why do we use std_thresh? 
+		Remove duplicates in first findmaxima call
+		Remove duplicates with the same nf and nmi? 
+	- Test this vs new routine. %[maxx,maxy]=FindMaximaBMH(ima,px,py,close_max);
+		- if necessary, filter after centering. 
+	- What is storeim doing? 
+	
+- File name: times_from_umanager_metadata
+	problem: assumes Z-stack is used for all micromanager datasets
 
-Remove duplicates in first findmaxima call
+- Alter JSO scope code to create output with numbers in numerical order.  Ensure that doesn't break this code. 
 
-Remove duplicates with the same nf and nmi? 
+- Use bright field to find cells and collect cell size
 
-make good 2 clolor test set.
+- For tracking account for whole image shifts. 
+
+- Filter out cells outside of a certain size range
+
+- Error handling for when no cells are detected.
+	%Make this function handle a situation where no cells are detected.
+	
+- documentation for data structure. 
+
+- refine and provide better help for gui
+
+- Add information about circle files.  
+
+- Calibrate with nuclear localization images. 
+
+- Are these even used? max_shift_rad, min_dist_thresh 
+
+- Gui for image visualization? 
 
 
 
