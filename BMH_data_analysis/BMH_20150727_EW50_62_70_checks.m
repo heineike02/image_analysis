@@ -23,15 +23,15 @@ shift_timing = [0,11.5]
 % Glucose Dropout (0.1 % from 2%) followed by Osmo shock (0.35M) at various times.
 % osmo balanced with sorbitol relative to osmotic stress condition.
 %
-%A1	
-%B1	
-%C1	
-%D1	
-%E1	
-%F1	
-%G1	
-%H1	
-%A2 
+%A1	 BMH42
+%B1	 EW50 1
+%C1	 EW50 2
+%D1	 EW62 1
+%E1	 EW62 2
+%F1	 EW62 3
+%G1	 EW70 1
+%H1	 EW70 2
+%A2  EW70 3 
 
 
 
@@ -46,9 +46,9 @@ hold on
 
 channel = 'RFP'
 legend_vec_RFP = {'BMH42','EW50 1','EW50 2'}
-cmap_RFP = [ 0,0,1;  %Black
+cmap_RFP = [ 0,0,0;  %Black
     1,0,0;  %Red
-    0.5,0,0 %Light Red
+    0.5,0,0 %Red 2
         ];  
 
 %cmap = jet(length(legend_vec_RFP));
@@ -102,13 +102,40 @@ title('Osmo shock RFP')
 xlabel('time')
 ylabel('Nuclear Localization')
 
+
+
 %YFP Channel
 figure(2)
+    
+fname_save = 'processed_data_62_70.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+all_tracks_vec_comb.EW62_70 = all_tracks_vec;
+all_times_vec_comb.EW62_70 = all_times_vec';
+
+data_file_list = {'BMH42','EW62_70'};
+clear('all_tracks_vec');
+clear('all_times_vec');
+all_tracks_vec = {};
+all_times_vec = {};
+for jj = 1:length(data_file_list);
+    all_tracks_vec = [all_tracks_vec , all_tracks_vec_comb.(data_file_list{jj})];
+    all_times_vec = [all_times_vec ; all_times_vec_comb.(data_file_list{jj})];
+end
+
+
 clf 
 hold on
 channel = 'YFP'
-legend_vec_YFP = legend_vec_RFP
-cmap_YFP = cmap_RFP
+legend_vec_YFP = {'BMH42','EW62 1','EW62 2', 'EW62 3', 'EW70 1', 'EW70 2', 'EW70 3'}
+cmap_YFP = [ 0,0,0;  %Black
+    0,0,1;  %Blue
+    0,1,1 %Blue 1
+    0,0.2,0.5 %Blue 2
+    0,1,0;  %Green
+    0,0.75,0; %Green 1
+    0,0.5,0; %Green 2
+        ];  
+perm = [1,2,3,4,5,6,7]
 %perm same as above
 legend_vec_YFP_plot = legend_vec_YFP(perm);
 cmap = cmap_YFP(perm,:);
@@ -137,6 +164,7 @@ ylabel('Nuclear Localization')
 
 
 
+%Everything below return is not plotted
 return
 
 %% SC.MSN2-RFP plot individual cells 

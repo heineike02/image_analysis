@@ -47,9 +47,21 @@ min_dist_thresh
 
 Test this vs new routine. %[maxx,maxy]=FindMaximaBMH(ima,px,py,close_max);
 
-- Option to forego tracking - just get parameters for each frame. 
-- Tracking should be able to follow big frame shifts - perhaps there is some recentering/computer vision algorithm we can run. 
 
-C:\Users\Ben\Documents\Data\PKA_project\20150727_EW050_62_70_check_GD\
+match_two_channels_Hung: 
+%Make this function handle a situation where no cells are detected.
 
-processed_data_50_maxdisp1_mintraj1.mat
+Center cells before using STD thresh
+
+Remove duplicates in first findmaxima call
+
+Remove duplicates with the same nf and nmi? 
+
+make good 2 clolor test set.
+
+
+
+
+
+
+

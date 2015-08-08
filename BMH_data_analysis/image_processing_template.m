@@ -5,7 +5,7 @@ function all_tracks = image_processing_template()
 %% Inputs
 
 %image processing directory
-ipdir = 'C:\Users\susanychen\GitHub\image_analysis\'
+ipdir = 'C:\Users\Ben\Documents\GitHub\image_analysis\'
 %adds image analysis directory to path 
 path(ipdir,path)
 analysis_params.ipdir = ipdir;
