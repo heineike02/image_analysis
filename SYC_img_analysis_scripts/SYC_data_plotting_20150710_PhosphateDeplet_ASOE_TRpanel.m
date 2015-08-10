@@ -12,13 +12,16 @@ function all_tracks = data_plotting_template()
 % set paths
 clear
 profile off
-ipdir = 'C:\Users\susanychen\GitHub\image_analysis\';
+%%%% ipdir = where your github code is located %%%%
+ipdir = '/Users/susanychen/Documents/image_analysis/';
+%ipdir = 'C:\Users\susanychen\GitHub\image_analysis\';
 %adds image analysis directory to path based on directry of day's analysis
 %code
 path(ipdir,path)
 
 %%%% base_dir = directory where single cell data is stored %%%%
-base_dir = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
+base_dir = '/Users/susanychen/Downloads/TempMatlabData20150808/';
+%base_dir = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
 %%%% phases = subfolders in the same experiment %%%%
 phases =  {'Pre','Post'}; %,'Post_p2'}
 %%%% fname_load = the .mat folder that contains the single cell data %%%%
@@ -74,7 +77,8 @@ for ii = 1:length(all_tracks_vec)
 end
         
 %%%% ffolder_save = folder where filtered traces will be stored %%%%
-ffolder_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
+ffolder_save = '/Users/susanychen/Downloads/TempMatlabData20150808/';
+%ffolder_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
 %%%% fname_save = file name of filtered traces %%%%
 fname_save = '20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 save(strcat(ffolder_save, fname_save),'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec')
@@ -82,7 +86,8 @@ save(strcat(ffolder_save, fname_save),'all_tracks_vec', 'all_times_vec','all_tra
 %% Feature Extraction and (Optional) Smoothing
 
 %%%% folder where the filtered traces live %%%%
-ffolder_load = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
+ffolder_load = '/Users/susanychen/Downloads/TempMatlabData20150808/';
+%ffolder_load = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
 %%%% filename of filtered traces %%%%
 fname_load = '20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 load(strcat(ffolder_load, fname_load),'all_tracks_filt_vec', 'all_times_filt_vec','posvec')
@@ -197,7 +202,8 @@ stress_type = {'20150710pHbasic','20150710pHbasic'...
     '20150710pHbasic','20150710pHbasic','20150710pHbasic'};
 
 %%%% fname_save = save plotting values/features %%%% -- stopped here
-fname_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
+fname_save = '/Users/susanychen/Downloads/TempMatlabData20150808/20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
+%fname_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 save([fname_save], 'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec',...
     'out_Features_cell',...
     'TR_names_long', 'TR_names_short','stress_type')
@@ -209,9 +215,11 @@ clf
 clear mean_val_cell; clear std_val_cell;
 
 %%%% base_dir = directory where single cell data is stored %%%%
-base_dir = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
+base_dir = '/Users/susanychen/Downloads/TempMatlabData20150808/';
+%base_dir = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
 %%%% specify the .mat file to load %%%%
 fname_load = '20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
+%fname_load = '20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 load([base_dir,fname_load],'all_times_filt_vec','all_tracks_filt_vec','out_Features_cell','TR_names_short', 'stress_type')
 %%%% specify the subfolders present in the experiment %%%%
 phases = {'Pre', 'Post'};
@@ -239,7 +247,7 @@ for theWells = 1:length(all_tracks_filt_vec) % loop through each well
         tracks = all_tracks.(phases{pH}); length(tracks)
         timevals = all_times.(phases{pH});
 
-        [p, timevals_cell{theWells,pH},mean_val_cell{theWells,pH}, std_val_cell{theWells,pH}] = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params); % either line plot or line plot with errorbars
+        [p, timevals_cell{theWells,pH},mean_val_cell{theWells,pH}, std_val_cell{theWells,pH}] = plot_meanvalues_syc(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params); % either line plot or line plot with errorbars
         hold on;
         title(TR_names_short{theWells})
         %%%% specify the x and y range of the plot %%%%
@@ -247,7 +255,9 @@ for theWells = 1:length(all_tracks_filt_vec) % loop through each well
     end
     
 end
-print('C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\plots_20150720\MeanCellPlot.pdf','-dpdf')
+
+print('/Users/susanychen/Downloads/TempMatlabData20150808/MeanCellPlot_20150710PhosphateDeplet.eps', '-depsc')
+%print('C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\plots_20150720\MeanCellPlot.pdf','-dpdf')
 
 %% SC.MSN2-RFP plot individual cells (filtered, not smoothed)
 % - variance of the time trace (captures presence of responders and non and
@@ -282,7 +292,9 @@ for jj = 1:Nwells
     axis([0,130,0,10])
     title(TR_names_short{jj})
 end
-print('C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\plots_20150720\SingleCellPlot.pdf','-dpdf')
+
+print('/Users/susanychen/Downloads/TempMatlabData20150808/SingleCellPlot_20150710PhosphateDeplet.eps', '-depsc')
+%print('C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\plots_20150720\SingleCellPlot.pdf','-dpdf')
 
 %% Plotting "Number of Peaks" Feature
 TR_names1 = {'cad1', 'com2', 'crz1', 'dot6', 'maf1', 'msn2' ,'yap1', 'stb3', 'sko1', 'rtg3', 'pho4' ,'nrg2', 'msn4'};
@@ -341,6 +353,8 @@ set(gca, 'xticklabel', TR_names1)
 xlabel('TRs'); ylabel('Number of Cells (count)')
 legend(strsplit(num2str(diffPeaks)))
 title('Proportion of Number of Peaks for TRs')
+
+print('/Users/susanychen/Downloads/TempMatlabData20150808/NumPeaksPlot_20150710PhosphateDeplet.eps', '-depsc')
 
 %% FIRST PEAK ONLY:
 % SUBPLOT: MAX HEIGHT, TIME MAX HEIGHT, PULSE WIDTH, OFFSLOPE, ONSLOPE
@@ -422,6 +436,8 @@ pulseWidthVecCell_1 = pulseWidthVecCell;
 offSlopeVecCell_1 = offSlopeVecCell;
 onSlopeVecCell_1 = onSlopeVecCell;
 
+print('/Users/susanychen/Downloads/TempMatlabData20150808/FirstPeakFeaturesPlot_20150710PhosphateDeplet.eps', '-depsc')
+
 %% SECOND PEAK ONLY:
 % SUBPLOT: MAX HEIGHT, TIME MAX HEIGHT, PULSE WIDTH, OFFSLOPE, ONSLOPE
 numWells = length(out_Features_cell);
@@ -487,6 +503,8 @@ pulseWidthVecCell_2 = pulseWidthVecCell;
 offSlopeVecCell_2 = offSlopeVecCell;
 onSlopeVecCell_2 = onSlopeVecCell;
 
+print('/Users/susanychen/Downloads/TempMatlabData20150808/SecondPeakFeaturesPlot_20150710PhosphateDeplet.eps', '-depsc')
+
 %% COMPARING FIRST AND SECOND PEAK FEATURES - plot over each other
 figure(3); 
 subplot(2,3,1); 
@@ -505,6 +523,8 @@ subplot(2,3,5);
 distributionPlot(onSlopeVecCell_1,'distWidth',0.9,'color', 'g', 'addSpread',0,'showMM',2,'xNames',TR_names1, 'yLabel', 'On Slope (nuc/cyt per 2min)'); title('On Slope');hold on;
 distributionPlot(onSlopeVecCell_2,'distWidth',0.9, 'color', 'c', 'addSpread',0, 'showMM',2);
 suptitle('Comparison of First and Second Peak Features');
+
+print('/Users/susanychen/Downloads/TempMatlabData20150808/FirstAndSecondPeakFeaturesPlot_20150710PhosphateDeplet.eps', '-depsc')
 
 %% Plotting correlations and correlation coefficients
 
