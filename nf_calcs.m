@@ -1,6 +1,5 @@
 function [mean_nf, std_nf] = nf_calcs(timevals,tracks,channel)
 
-<<<<<<< HEAD
 mean_nf = zeros(nTimes,1);
 std_nf = zeros(nTimes,1);
 for kk = 1:nTimes
