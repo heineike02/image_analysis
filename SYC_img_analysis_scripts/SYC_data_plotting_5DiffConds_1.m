@@ -38,7 +38,8 @@ load([base_dir,fname_load],'all_times_vec','all_tracks_vec','posvec')
 %%%% field => 'nf' = 3 or 'nmi' = 4 %%%%
 field = 3;
 %%%% Xper = percent of max trace length %%%%
-Xper = 0.95;
+Xper = 0.9;
+%Xper = 0.95;
 
 % loop through each well
 for ii = 1:length(all_tracks_vec)
@@ -78,16 +79,21 @@ for ii = 1:length(all_tracks_vec)
     all_tracks_filt_vec{ii} = all_tracks_filt;
     all_times_filt_vec{ii} = all_times_filt;
 end
-        
+
+cell_num_filt_vec = [];
+for hh = 1:length(all_tracks_filt_vec) 
+    cell_num_filt_vec(hh) = length(all_tracks_filt_vec{hh}.Post);
+end
+
+% How many cells remain after initial filtering?
 %%%% ffolder_save = folder where filtered traces will be stored %%%%
 ffolder_save = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 %ffolder_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
 %%%% fname_save = file name of filtered traces %%%%
 fname_save = '20150709_SorbitolStress_ASOE_TRpanel_20150720_filter.mat';
-save(strcat(ffolder_save, fname_save),'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec')
+save(strcat(ffolder_save, fname_save),'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec', 'cell_num_filt_vec')
 
 %% Feature Extraction and (Optional) Smoothing
-
 %%%% folder where the filtered traces live %%%%
 ffolder_load = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 %ffolder_load = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
@@ -95,6 +101,7 @@ ffolder_load = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 fname_load = '20150709_SorbitolStress_ASOE_TRpanel_20150720_filter.mat';
 load(strcat(ffolder_load, fname_load),'all_tracks_filt_vec', 'all_times_filt_vec','posvec')
 % clear old variables
+clear out_Features_cell;
 clear t_singlecell_cell; clear y_singlecell_cell;
 
 % set variables
@@ -149,7 +156,7 @@ for ii = 1:length(Nwells_singleCell)
         display(strcat('This is cell: ', num2str(kk)))
         
         %%%% threshold for peakfinder function, empirically derived %%%%
-        peakFindr.Sel = 0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
+        peakFindr.Sel = 0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
         %%%% in peakfinder function, lower bound of peak %%%%
         peakFindr.Thresh = 1.5;
         %%%% empirically derived, only change if want to lower the threshold %%%%
@@ -182,6 +189,26 @@ for ii = 1:length(Nwells_singleCell)
     clear out_Features;
 end
 
+% number of cells with peaks and no peaks
+numWells = length(out_Features_cell);
+zeroPeakNum = [];
+hasPeakNum = [];
+for gg = 1:numWells
+    numCells = length(out_Features_cell(gg).out_Features);
+    ee = 1;
+    ff = 1;
+for qq = 1:numCells
+    currPeakNum = out_Features_cell(gg).out_Features(qq).cell.NumPeaks;
+    if currPeakNum == 0;    
+        ee = ee+1;
+    else  
+        ff = ff+1;
+    end
+end
+    out_Features_cell(gg).zeroPeakNum = ee;
+    out_Features_cell(gg).hasPeakNum = ff;
+end
+
 %%%% TR_names_long =  the labels that go with each well %%%%
 TR_names_long = {'SYC1-67 Cad1 phosphate deplete SDC', 'SYC1-73 Com2', ...
     'SYC1-70 crz1', 'SYC1-62 Dot6', ...
@@ -209,7 +236,7 @@ fname_save = '/Users/susanychen/Downloads/TempMatlabData20150808/20150709_Sorbit
 %fname_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 save([fname_save], 'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec',...
     'out_Features_cell',...
-    'TR_names_long', 'TR_names_short','stress_type')
+    'TR_names_long', 'TR_names_short','stress_type', 'cell_num_filt_vec')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GD2
 % This function:
@@ -248,7 +275,8 @@ load([base_dir,fname_load],'all_times_vec','all_tracks_vec','posvec')
 %%%% field => 'nf' = 3 or 'nmi' = 4 %%%%
 field = 3;
 %%%% Xper = percent of max trace length %%%%
-Xper = 0.95;
+%Xper = 0.95;
+Xper=0.9;
 
 % loop through each well
 for ii = 1:length(all_tracks_vec)
@@ -288,7 +316,12 @@ for ii = 1:length(all_tracks_vec)
     all_tracks_filt_vec{ii} = all_tracks_filt;
     all_times_filt_vec{ii} = all_times_filt;
 end
-        
+   
+cell_num_filt_vec = [];
+for hh = 1:length(all_tracks_filt_vec) 
+    cell_num_filt_vec(hh) = length(all_tracks_filt_vec{hh}.Post);
+end
+
 %%%% ffolder_save = folder where filtered traces will be stored %%%%
 ffolder_save = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 %ffolder_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
@@ -305,6 +338,7 @@ ffolder_load = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 fname_load = '20150629_GD_doseresp_Msn2Msn4Maf1Stb3_20150720_filter.mat';
 load(strcat(ffolder_load, fname_load),'all_tracks_filt_vec', 'all_times_filt_vec','posvec')
 % clear old variables
+clear out_Features_cell;
 clear t_singlecell_cell; clear y_singlecell_cell;
 
 % set variables
@@ -359,7 +393,7 @@ for ii = 1:length(Nwells_singleCell)
         display(strcat('This is cell: ', num2str(kk)))
         
         %%%% threshold for peakfinder function, empirically derived %%%%
-        peakFindr.Sel = 0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
+        peakFindr.Sel = 0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
         %%%% in peakfinder function, lower bound of peak %%%%
         peakFindr.Thresh = 1.5;
         %%%% empirically derived, only change if want to lower the threshold %%%%
@@ -392,6 +426,26 @@ for ii = 1:length(Nwells_singleCell)
     clear out_Features;
 end
 
+% number of cells with peaks and no peaks
+numWells = length(out_Features_cell);
+zeroPeakNum = [];
+hasPeakNum = [];
+for gg = 1:numWells
+    numCells = length(out_Features_cell(gg).out_Features);
+    ee = 1;
+    ff = 1;
+for qq = 1:numCells
+    currPeakNum = out_Features_cell(gg).out_Features(qq).cell.NumPeaks;
+    if currPeakNum == 0;    
+        ee = ee+1;
+    else  
+        ff = ff+1;
+    end
+end
+    out_Features_cell(gg).zeroPeakNum = ee;
+    out_Features_cell(gg).hasPeakNum = ff;
+end
+
 %%%% TR_names_long =  the labels that go with each well %%%%
 TR_names_long = {'SYC1-72 Msn2 1%','SYC1-74 Msn4 1%', 'SYC1-75 Maf1 1%', 'SYC1-76 Stb3 1%',...
     'SYC1-72 Msn2 0.5%','SYC1-74 Msn4 0.5%', 'SYC1-75 Maf1 0.5%', 'SYC1-76 Stb3 0.5%',...
@@ -413,7 +467,7 @@ fname_save = '/Users/susanychen/Downloads/TempMatlabData20150808/20150629_GD_dos
 %fname_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 save([fname_save], 'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec',...
     'out_Features_cell',...
-    'TR_names_long', 'TR_names_short','stress_type')
+    'TR_names_long', 'TR_names_short','stress_type', 'cell_num_filt_vec')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GD1
@@ -453,7 +507,8 @@ load([base_dir,fname_load],'all_times_vec','all_tracks_vec','posvec')
 %%%% field => 'nf' = 3 or 'nmi' = 4 %%%%
 field = 3;
 %%%% Xper = percent of max trace length %%%%
-Xper = 0.95;
+%Xper = 0.95;
+Xper=0.9;
 
 % loop through each well
 for ii = 1:length(all_tracks_vec)
@@ -493,13 +548,18 @@ for ii = 1:length(all_tracks_vec)
     all_tracks_filt_vec{ii} = all_tracks_filt;
     all_times_filt_vec{ii} = all_times_filt;
 end
-        
+
+cell_num_filt_vec = [];
+for hh = 1:length(all_tracks_filt_vec) 
+    cell_num_filt_vec(hh) = length(all_tracks_filt_vec{hh}.Post);
+end
+
 %%%% ffolder_save = folder where filtered traces will be stored %%%%
 ffolder_save = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 %ffolder_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
 %%%% fname_save = file name of filtered traces %%%%
 fname_save = '20150630_GD_binary_BMH35adhOE_20150720_filter.mat';
-save(strcat(ffolder_save, fname_save),'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec')
+save(strcat(ffolder_save, fname_save),'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec', 'cell_num_filt_vec')
 
 %% Feature Extraction and (Optional) Smoothing
 
@@ -510,6 +570,7 @@ ffolder_load = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 fname_load = '20150630_GD_binary_BMH35adhOE_20150720_filter.mat';
 load(strcat(ffolder_load, fname_load),'all_tracks_filt_vec', 'all_times_filt_vec','posvec')
 % clear old variables
+clear out_Features_cell;
 clear t_singlecell_cell; clear y_singlecell_cell;
 
 % set variables
@@ -564,7 +625,7 @@ for ii = 1:length(Nwells_singleCell)
         display(strcat('This is cell: ', num2str(kk)))
         
         %%%% threshold for peakfinder function, empirically derived %%%%
-        peakFindr.Sel = 0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
+        peakFindr.Sel = 0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
         %%%% in peakfinder function, lower bound of peak %%%%
         peakFindr.Thresh = 1.5;
         %%%% empirically derived, only change if want to lower the threshold %%%%
@@ -597,6 +658,26 @@ for ii = 1:length(Nwells_singleCell)
     clear out_Features;
 end
 
+% number of cells with peaks and no peaks
+numWells = length(out_Features_cell);
+zeroPeakNum = [];
+hasPeakNum = [];
+for gg = 1:numWells
+    numCells = length(out_Features_cell(gg).out_Features);
+    ee = 1;
+    ff = 1;
+for qq = 1:numCells
+    currPeakNum = out_Features_cell(gg).out_Features(qq).cell.NumPeaks;
+    if currPeakNum == 0;    
+        ee = ee+1;
+    else  
+        ff = ff+1;
+    end
+end
+    out_Features_cell(gg).zeroPeakNum = ee;
+    out_Features_cell(gg).hasPeakNum = ff;
+end
+
 %%%% TR_names_long =  the labels that go with each well %%%%
 TR_names_long = {'SYC1-62 Dot6', 'SYC1-71 Pho4', 'SYC1-72 Msn2', 'SYC1-65 Rtg3', ...
     'SYC1-67 Cad1' ,'SYC1-68 Nrg2', ...
@@ -618,7 +699,7 @@ fname_save = '/Users/susanychen/Downloads/TempMatlabData20150808/20150630_GD_bin
 %fname_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 save([fname_save], 'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec',...
     'out_Features_cell',...
-    'TR_names_long', 'TR_names_short','stress_type')
+    'TR_names_long', 'TR_names_short','stress_type', 'cell_num_filt_vec')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Calcofluor Zymolyase
@@ -658,7 +739,8 @@ load([base_dir,fname_load],'all_times_vec','all_tracks_vec','posvec')
 %%%% field => 'nf' = 3 or 'nmi' = 4 %%%%
 field = 3;
 %%%% Xper = percent of max trace length %%%%
-Xper = 0.95;
+%Xper = 0.95;
+Xper=0.9;
 
 % loop through each well
 for ii = 1:length(all_tracks_vec)
@@ -698,7 +780,12 @@ for ii = 1:length(all_tracks_vec)
     all_tracks_filt_vec{ii} = all_tracks_filt;
     all_times_filt_vec{ii} = all_times_filt;
 end
-        
+
+cell_num_filt_vec = [];
+for hh = 1:length(all_tracks_filt_vec) 
+    cell_num_filt_vec(hh) = length(all_tracks_filt_vec{hh}.Post);
+end
+
 %%%% ffolder_save = folder where filtered traces will be stored %%%%
 ffolder_save = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 %ffolder_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
@@ -715,6 +802,7 @@ ffolder_load = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 fname_load = '20150716_Calcofluor_Zymolyase_ASOE_5TRs_filter.mat';
 load(strcat(ffolder_load, fname_load),'all_tracks_filt_vec', 'all_times_filt_vec','posvec')
 % clear old variables
+clear out_Features_cell;
 clear t_singlecell_cell; clear y_singlecell_cell;
 
 % set variables
@@ -769,7 +857,7 @@ for ii = 1:length(Nwells_singleCell)
         display(strcat('This is cell: ', num2str(kk)))
         
         %%%% threshold for peakfinder function, empirically derived %%%%
-        peakFindr.Sel = 0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
+        peakFindr.Sel = 0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
         %%%% in peakfinder function, lower bound of peak %%%%
         peakFindr.Thresh = 1.5;
         %%%% empirically derived, only change if want to lower the threshold %%%%
@@ -802,6 +890,26 @@ for ii = 1:length(Nwells_singleCell)
     clear out_Features;
 end
 
+% number of cells with peaks and no peaks
+numWells = length(out_Features_cell);
+zeroPeakNum = [];
+hasPeakNum = [];
+for gg = 1:numWells
+    numCells = length(out_Features_cell(gg).out_Features);
+    ee = 1;
+    ff = 1;
+for qq = 1:numCells
+    currPeakNum = out_Features_cell(gg).out_Features(qq).cell.NumPeaks;
+    if currPeakNum == 0;    
+        ee = ee+1;
+    else  
+        ff = ff+1;
+    end
+end
+    out_Features_cell(gg).zeroPeakNum = ee;
+    out_Features_cell(gg).hasPeakNum = ff;
+end
+
 %%%% TR_names_long =  the labels that go with each well %%%%
 TR_names_long = {'SYC1-62 Dot6 calco', 'SYC1-71 Pho4 calco', 'SYC1-72 Msn2 calco', 'SYC1-74 Msn4 calco', 'SYC1-75 Maf1 calco', ...
     'SYC1-75 Maf1 zymo', 'SYC1-74 Msn4 zymo', 'SYC1-72 Msn2 zymo', 'SYC1-71 Pho4 zymo', 'SYC1-62 Dot6 zymo'};
@@ -821,7 +929,7 @@ fname_save = '/Users/susanychen/Downloads/TempMatlabData20150808/20150716_Calcof
 %fname_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 save([fname_save], 'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec',...
     'out_Features_cell',...
-    'TR_names_long', 'TR_names_short','stress_type')
+    'TR_names_long', 'TR_names_short','stress_type', 'cell_num_filt_vec')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% pH
@@ -861,7 +969,8 @@ load([base_dir,fname_load],'all_times_vec','all_tracks_vec','posvec')
 %%%% field => 'nf' = 3 or 'nmi' = 4 %%%%
 field = 3;
 %%%% Xper = percent of max trace length %%%%
-Xper = 0.95;
+%Xper = 0.95;
+Xper=0.9;
 
 % loop through each well
 for ii = 1:length(all_tracks_vec)
@@ -901,7 +1010,12 @@ for ii = 1:length(all_tracks_vec)
     all_tracks_filt_vec{ii} = all_tracks_filt;
     all_times_filt_vec{ii} = all_times_filt;
 end
-        
+
+cell_num_filt_vec = [];
+for hh = 1:length(all_tracks_filt_vec) 
+    cell_num_filt_vec(hh) = length(all_tracks_filt_vec{hh}.Post);
+end
+
 %%%% ffolder_save = folder where filtered traces will be stored %%%%
 ffolder_save = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 %ffolder_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
@@ -918,6 +1032,7 @@ ffolder_load = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 fname_load = '20150716_PhosphateDeplet_pH_ASOE_5TRs_20150720_filter.mat';
 load(strcat(ffolder_load, fname_load),'all_tracks_filt_vec', 'all_times_filt_vec','posvec')
 % clear old variables
+clear out_Features_cell;
 clear t_singlecell_cell; clear y_singlecell_cell;
 
 % set variables
@@ -972,7 +1087,7 @@ for ii = 1:length(Nwells_singleCell)
         display(strcat('This is cell: ', num2str(kk)))
         
         %%%% threshold for peakfinder function, empirically derived %%%%
-        peakFindr.Sel = 0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
+        peakFindr.Sel = 0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
         %%%% in peakfinder function, lower bound of peak %%%%
         peakFindr.Thresh = 1.5;
         %%%% empirically derived, only change if want to lower the threshold %%%%
@@ -1005,6 +1120,26 @@ for ii = 1:length(Nwells_singleCell)
     clear out_Features;
 end
 
+% number of cells with peaks and no peaks
+numWells = length(out_Features_cell);
+zeroPeakNum = [];
+hasPeakNum = [];
+for gg = 1:numWells
+    numCells = length(out_Features_cell(gg).out_Features);
+    ee = 1;
+    ff = 1;
+for qq = 1:numCells
+    currPeakNum = out_Features_cell(gg).out_Features(qq).cell.NumPeaks;
+    if currPeakNum == 0;    
+        ee = ee+1;
+    else  
+        ff = ff+1;
+    end
+end
+    out_Features_cell(gg).zeroPeakNum = ee;
+    out_Features_cell(gg).hasPeakNum = ff;
+end
+
 %%%% TR_names_long =  the labels that go with each well %%%%
 TR_names_long = {'SYC1-62 Dot6 phospho', 'SYC1-71 Pho4 phospho', 'SYC1-72 Msn2 phospho', 'SYC1-74 Msn4 phospho', 'SYC1-75 Maf1 phospho', ...
     'SYC1-75 Maf1 pH5.15', 'SYC1-74 Msn4 pH5.15', 'SYC1-72 Msn2 pH5.15', 'SYC1-71 Pho4 pH5.15', 'SYC1-62 Dot6 pH5.15'};
@@ -1024,8 +1159,57 @@ fname_save = '/Users/susanychen/Downloads/TempMatlabData20150808/20150716_Phosph
 %fname_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 save([fname_save], 'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec',...
     'out_Features_cell',...
-    'TR_names_long', 'TR_names_short','stress_type')
+    'TR_names_long', 'TR_names_short','stress_type', 'cell_num_filt_vec')
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% generating a rate of peak finding vs sel threshold plot
+
+Pho4_5cond_feat1.Pho4 = out_Features_cell(2).out_Features;
+
+% Pho4 environmental conditions
+for bb = 1:length(Pho4_5cond_feat1) % this is each environmental condition
+    currEnvCond = Pho4_5cond_feat1(bb).Pho4;
+    figure;
+    if length(currEnvCond) > 81 
+        for aa = 1:81 % go through every single cell
+            subplot(9,9,aa);
+            currCell = currEnvCond(aa).cell;
+            plot(currCell.TimeTraceTimes, currCell.TimeTrace, 'linewidth', 5); 
+            if currCell.NumPeaks ~= 0
+                hold on;
+                plot(currCell.TimeMaxHeight, currCell.MaxHeight, 'r.', 'markersize', 20);
+                if ~isempty(currCell.OnSlopeTime)
+                    plot([currCell.OnSlopeTime], [2], 'g.', 'markersize', 20);
+                end
+                if ~isempty(currCell.OffSlopeTime)
+                    plot([currCell.OffSlopeTime], [2], 'g.', 'markersize', 20);
+                end
+            end
+            axis([0 100 1 7])
+        end
+    else 
+        numSub = ceil(sqrt(length(currEnvCond)));
+        for aa = 1:length(currEnvCond);
+            subplot(numSub,numSub,aa);
+            currCell = currEnvCond(aa).cell;
+            plot(currCell.TimeTraceTimes, currCell.TimeTrace, 'linewidth', 5); 
+            if currCell.NumPeaks ~= 0
+                hold on;
+                plot(currCell.TimeMaxHeight, currCell.MaxHeight, 'r.', 'markersize', 20);
+                if ~isempty(currCell.OnSlopeTime)
+                    plot([currCell.OnSlopeTime], [2], 'g.', 'markersize', 20);
+                end
+                if ~isempty(currCell.OffSlopeTime)
+                    plot([currCell.OffSlopeTime], [2], 'g.', 'markersize', 20);
+                end
+            end
+            axis([0 100 1 7])
+        end
+    end
+    suptitle(['Pho4:', condNames{bb}])
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% ND
 
 % This function:
@@ -1064,7 +1248,8 @@ load([base_dir,fname_load],'all_times_vec','all_tracks_vec','posvec')
 %%%% field => 'nf' = 3 or 'nmi' = 4 %%%%
 field = 3;
 %%%% Xper = percent of max trace length %%%%
-Xper = 0.95;
+%Xper = 0.95;
+Xper=0.9;
 
 % loop through each well
 for ii = 1:length(all_tracks_vec)
@@ -1104,13 +1289,18 @@ for ii = 1:length(all_tracks_vec)
     all_tracks_filt_vec{ii} = all_tracks_filt;
     all_times_filt_vec{ii} = all_times_filt;
 end
-        
+
+cell_num_filt_vec = [];
+for hh = 1:length(all_tracks_filt_vec) 
+    cell_num_filt_vec(hh) = length(all_tracks_filt_vec{hh}.Post);
+end
+
 %%%% ffolder_save = folder where filtered traces will be stored %%%%
 ffolder_save = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 %ffolder_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\';
 %%%% fname_save = file name of filtered traces %%%%
 fname_save = '20150717_AmmoniumSulfateStarvation_ASOE_5TRs_20150720_filter.mat';
-save(strcat(ffolder_save, fname_save),'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec')
+save(strcat(ffolder_save, fname_save),'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec', 'cell_num_filt_vec')
 
 %% Feature Extraction and (Optional) Smoothing
 
@@ -1121,6 +1311,7 @@ ffolder_load = '/Users/susanychen/Downloads/TempMatlabData20150808/';
 fname_load = '20150717_AmmoniumSulfateStarvation_ASOE_5TRs_20150720_filter.mat';
 load(strcat(ffolder_load, fname_load),'all_tracks_filt_vec', 'all_times_filt_vec','posvec')
 % clear old variables
+clear out_Features_cell;
 clear t_singlecell_cell; clear y_singlecell_cell;
 
 % set variables
@@ -1167,27 +1358,32 @@ for ii = 1:length(Nwells_singleCell)
     
     display(strcat('This is well: ', num2str(ii)))
     
+    if ii == 4
+        singleCells(184) = [];
+        singleCells(201) = [];
+    end 
+    
     % loop through each single cell trace
     for kk = 1:length(singleCells)  
-         
+        
         singleCells1 = singleCells(kk);
-        
+
         display(strcat('This is cell: ', num2str(kk)))
-        
+
         %%%% threshold for peakfinder function, empirically derived %%%%
-        peakFindr.Sel = 0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
+        peakFindr.Sel = 0.05; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
         %%%% in peakfinder function, lower bound of peak %%%%
         peakFindr.Thresh = 1.5;
         %%%% empirically derived, only change if want to lower the threshold %%%%
         peakFindr.StdMinus = 0; %0.2; 
-        
+
         % test plot
         %figure; plot(singleCells1.nf);
         %%plot(out_Features(kk).cell.TimeMaxHeight', out_Features(kk).cell.MaxHeight, 'ro');
-        
+
         % extract features: number of peaks, max height(s), time(s) of max height, rise time (on slope, off slope, on slope time, off slope time), duration of pulse
         out_Features(kk).cell = extract_singlecell_features_Analysis(tsingleCells, singleCells1,var_to_plot, smoothFn, peakFindr);
-        
+
         % test plot
         %figure; plot(out_Features(kk).cell.TimeTraceTimes',out_Features(kk).cell.TimeTrace); hold on;
         %plot(out_Features(kk).cell.TimeMaxHeight', out_Features(kk).cell.MaxHeight, 'ro');
@@ -1198,14 +1394,34 @@ for ii = 1:length(Nwells_singleCell)
         %if isfield(out_Features(kk).cell, 'OnSlopeTime')
         %    plot(out_Features(kk).cell.OnSlopeTime, 2*ones(1,length(out_Features(kk).cell.OffSlopeTime)),'c.')
         %end
-        %axis([0 140 1 10])  
-         
+        %axis([0 140 1 10]) 
+   
     end
     
     % store features
     out_Features_cell(ii).out_Features = out_Features;
 
     clear out_Features;
+end
+
+% number of cells with peaks and no peaks
+numWells = length(out_Features_cell);
+zeroPeakNum = [];
+hasPeakNum = [];
+for gg = 1:numWells
+    numCells = length(out_Features_cell(gg).out_Features);
+    ee = 1;
+    ff = 1;
+for qq = 1:numCells
+    currPeakNum = out_Features_cell(gg).out_Features(qq).cell.NumPeaks;
+    if currPeakNum == 0;    
+        ee = ee+1;
+    else  
+        ff = ff+1;
+    end
+end
+    out_Features_cell(gg).zeroPeakNum = ee;
+    out_Features_cell(gg).hasPeakNum = ff;
 end
 
 %%%% TR_names_long =  the labels that go with each well %%%%
@@ -1222,9 +1438,10 @@ stress_type = {'20150717 Ammonium sulfate depletion'}; %,'20150710pHbasic'...
     %'20150710pHbasic','20150710pHbasic'...
     %'20150710pHbasic','20150710pHbasic','20150710pHbasic'};
 
+    
 %%%% fname_save = save plotting values/features %%%% -- stopped here
 fname_save = '/Users/susanychen/Downloads/TempMatlabData20150808/20150717_AmmoniumSulfateStarvation_ASOE_5TRs_20150720_filter.mat';
 %fname_save = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150710_PhosphateDeplet_ASOE_TRpanel\processed_data_20150720\20150710_PhosphateDeplet_ASOE_TRpanel_20150720_filter.mat';
 save([fname_save], 'all_tracks_vec', 'all_times_vec','all_tracks_filt_vec', 'all_times_filt_vec','posvec',...
     'out_Features_cell',...
-    'TR_names_long', 'TR_names_short','stress_type')
+    'TR_names_long', 'TR_names_short','stress_type','cell_num_filt_vec')
