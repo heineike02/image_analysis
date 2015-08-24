@@ -23,7 +23,7 @@ singleCellTraceTime = tsingleCells(singleCellTraceTime);
 if smoothFn.flag == 1
     %figure; 
     %plot(singleCellTraceTime, singleCellTrace);
-    singleCellTrace = smooth(singleCellTrace, smoothFn.span, smoothFn.method);
+    singleCellTrace = smooth(singleCellTrace.RFP, smoothFn.span, smoothFn.method);
     %hold on; plot(singleCellTraceTime, singleCellTrace,'r');
 end
 
