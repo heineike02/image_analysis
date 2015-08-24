@@ -4,6 +4,11 @@ function filtered_tracks_cell = filter_singlecell_Analysis(tracks, field, Xper)
     tracks_cell(:,:) = struct2cell(tracks);
     % isolate the single cell traces
     desired_track_cell = tracks_cell(field,:);
+    % access the .RFP (.channel) info
+    desired_track_cell = cell2mat(desired_track_cell);
+    % access the .RFP
+    temp_track_var(:,:) = struct2cell(desired_track_cell);
+    desired_track_cell = temp_track_var;
     % obtain the lengths of each trace
     track_lengths = cellfun(@length, desired_track_cell, 'UniformOutput', false);
     track_lengths = cell2mat(track_lengths);
