@@ -67,6 +67,7 @@ handles.output = hObject;
 % Initialize various parameters as the listed defaults
 handles.ipdir = get(handles.ipdir,'String');
 handles.base_dir = get(handles.base_dir,'String');
+handles.fname_save = get(handles.fname_save,'String');
 fname_conv_options = get(handles.fname_conv,'String');
 handles.fname_conv = fname_conv_options{1};
 
