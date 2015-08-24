@@ -116,7 +116,7 @@ if include_endpoints
     leftMin = minMag;
 else
     x = x0(ind);
-    minMag = min(x); %minimum trace value among the inflection points
+    [minMag, minLoc] = min(x); %minimum trace value among the inflection points
     leftMin = nanmedian(x0)-stdMinus*nanstd(x0); % is this the best way??? % basically the MEAN of the TRACE
     %leftMin = x0(1);
 end
@@ -128,6 +128,7 @@ if len > 1
 %if len > 2 % Function with peaks and valleys
     % Set initial parameters for loop
     tempMag = minMag;
+    tempLoc = minLoc; %%%% add on to get rid of error
     foundPeak = false;
     
     if include_endpoints
