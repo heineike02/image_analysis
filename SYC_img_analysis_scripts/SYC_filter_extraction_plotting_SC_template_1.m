@@ -1,4 +1,4 @@
-function [] = SYC_filter_extraction_plotting_SC_template_1(ipdir, base_dir, phases, fname_load, well_order, perturbation,Xper, smoothFn)
+function [] = SYC_filter_extraction_plotting_SC_template_1(ipdir, base_dir, phases, fname_load, well_order, perturbation)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This function:
@@ -32,7 +32,7 @@ function [] = SYC_filter_extraction_plotting_SC_template_1(ipdir, base_dir, phas
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set paths
-%clear
+clear
 profile off
 ipdir = ipdir;
 %adds image analysis directory to path based on directry of day's analysis
@@ -56,7 +56,7 @@ load([base_dir,fname_load],'all_times_vec','all_tracks_vec','posvec')
 %%%% field => 'nf' = 3 or 'nmi' = 4 %%%%
 field = 3;
 %%%% Xper = percent of max trace length %%%%
-%Xper = 0.9;
+Xper = 0.9;
 %Xper = 0.95;
 
 % loop through each well
@@ -78,16 +78,14 @@ for ii = 1:length(all_tracks_vec)
         % convert back to structure from cell
         filtered_tracks_struct = cell2struct(filtered_tracks_cell, {'Cxloc','Cyloc', 'nf', 'nmi', 'times', 'length', 'pos'}, 1);
         
-%         % build back the storage structure
-%         if jj == 1 % this is Pre
-%             all_tracks_filt.Pre = filtered_tracks_struct;
-%             all_times_filt.Pre = timevals;
-%         elseif jj == 2 % this is Post
-%             all_tracks_filt.Post = filtered_tracks_struct;
-%             all_times_filt.Post = timevals;
-%         end
-        all_tracks_filt.Post = filtered_tracks_struct;
-        all_times_filt.Post = timevals;
+        % build back the storage structure
+        if jj == 1 % this is Pre
+            all_tracks_filt.Pre = filtered_tracks_struct;
+            all_times_filt.Pre = timevals;
+        elseif jj == 2 % this is Post
+            all_tracks_filt.Post = filtered_tracks_struct;
+            all_times_filt.Post = timevals;
+        end
         
         % visual check
         %if jj == 2
@@ -146,22 +144,18 @@ for jj = 1:Nwells
     end
 end
 
-%Nwells_singleCell = y_singlecell_cell(:,2);
-%Nwells_t_singleCell = t_singlecell_cell(:,2);
-Nwells_singleCell = y_singlecell_cell(:,1);
-Nwells_t_singleCell = t_singlecell_cell(:,1);
+Nwells_singleCell = y_singlecell_cell(:,2);
+Nwells_t_singleCell = t_singlecell_cell(:,2);
 
 % set the variables for feature extraction
 %%%% 'nf' = nuclear localization %%%%
 var_to_plot = 'nf';
 %%%% 1 = smooth, 0 = don't smooth %%%%
-%smoothFn.flag = 1;
+smoothFn.flag = 1;
 %%%% method for smoothing, see smooth function for more options %%%%
-%smoothFn.method = 'sgolay';
-%smoothFn.method = 'moving';
+smoothFn.method = 'sgolay';
 %%%% the window of smoothing, value found empirically %%%%
-%smoothFn.span = 0.4; % span of 40%
-%smoothFn.span = 30;
+smoothFn.span = 0.4; % span of 40%
 
 % Smoothes and extracts features from single cell traces
 % loop through each well
@@ -181,7 +175,7 @@ for ii = 1:length(Nwells_singleCell)
         display(strcat('This is cell: ', num2str(kk)))
         
         %%%% threshold for peakfinder function, empirically derived %%%%
-        peakFindr.Sel = 0.1;%0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
+        peakFindr.Sel = 0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
         %%%% in peakfinder function, lower bound of peak %%%%
         peakFindr.Thresh = 1.5;
         %%%% empirically derived, only change if want to lower the threshold %%%%
