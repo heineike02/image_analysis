@@ -37,8 +37,12 @@ if nargin && ischar(varargin{1})
 end
 
 if nargout
+    %gui_State
     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
 else
+    %gui_State
+    %varargin
+    %varargin{4}
     gui_mainfcn(gui_State, varargin{:});
 end
 % End initialization code - DO NOT EDIT
@@ -63,6 +67,7 @@ handles.output = hObject;
 % Initialize various parameters as the listed defaults
 handles.ipdir = get(handles.ipdir,'String');
 handles.base_dir = get(handles.base_dir,'String');
+handles.fname_save = get(handles.fname_save,'String');
 fname_conv_options = get(handles.fname_conv,'String');
 handles.fname_conv = fname_conv_options{1};
 
@@ -93,7 +98,7 @@ handles.maxdisp_1x = str2double(get(handles.maxdisp_1x,'String'));
 
 
 % Update handles structure
-guidata(hObject, handles);
+guidata(hObject, handles)
 
 
 
@@ -179,6 +184,9 @@ function phases_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
+handles
+eventdata
+hObject
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -821,7 +829,8 @@ function load_phase_table_Callback(hObject, eventdata, handles)
 % hObject    handle to load_phase_table (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-phase_table_data = get(handles.phase_table,'Data');
+
+phase_table_data = get(handles.phase_table,'Data')
 Nphases = find(1-strcmp('',{phase_table_data{1,:}}), 1, 'last' );
 phases = {phase_table_data{1,1:Nphases}};
 handles.phases = phases;
@@ -873,7 +882,7 @@ function phase_table_workspace_Callback(hObject, eventdata, handles)
 % hObject    handle to phase_table_workspace (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+   
 % Hints: get(hObject,'String') returns contents of phase_table_workspace as text
 %        str2double(get(hObject,'String')) returns contents of phase_table_workspace as a double
 

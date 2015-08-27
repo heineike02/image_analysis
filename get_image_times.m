@@ -9,7 +9,7 @@ time_inds = 1:nTimes;
 if isnumeric(time_calc)
    %method of calculating time is dt 
    time_vals = time_calc*(0:(nTimes-1));
-elseif ischar(time_calc)
+elseif ischar(time_calc) % either JSO or Micromanager
    time_vals = zeros(size(time_inds));
    if strcmp(fname_conv,'JSO')
        metadata = regexp(importdata(time_calc),'\t','split');
@@ -18,12 +18,13 @@ elseif ischar(time_calc)
             time_fnames{jj} = metadata{jj}{9};
        end
    
-       for jj = 1:nTimes
-            fname = images(jj).(channel_to_image);
+       for jj = 1:nTimes % time that corresponds to the t# for 1 well
+            jj;
+            fname = images(1).(channel_to_image){jj};
             %acqdata file numbers filenames in the metadata differently (start
             %time at 0) than it names the actual filenames (starting at 1)
             %fname_times = char(strcat(channel_to_image,'_',pos_fnames_nn,'_t',int2str(channel_mod-1+(mm-1)*Nchan),'.tiff'));      
-            [fname_parts,fname_time] = regexp(fname,'_t([0-9]*).','split','tokens');
+            [fname_parts,fname_time] = regexpi(fname,'_t([0-9]*).','split','tokens');
             fname_metadata = [fname_parts{1},'_t',num2str(str2num(fname_time{1}{1})-1),'.',fname_parts{2}];
             metadata_ind = strcmp(time_fnames,fname_metadata);
             time = str2double(metadata{metadata_ind}{1})/60.0; %in minutes
