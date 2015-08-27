@@ -38,24 +38,39 @@ positions = length(pos_fnames);
 Nchan = length(channels);
 
 for nn = 1:positions
+    thePos = nn % TEST
     pos_fnames_nn = pos_fnames{nn}; % looping through each field of view
+    
+    if length(channel_to_image) == 2
+        channels_to_image = channel_to_image;
+        for ch = 1:length(channels_to_image)
+            channel_to_image = channels_to_image{ch};
+            %get filenames and put them into a strucure
+            images0 = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
+            
+            images.(channel_to_image) = images0.(channel_to_image);
+            %get times
+            [time_inds, time_valsCH.(channel_to_image)] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
+            %time_inds should be the same - time vals might be slightly
+            %different
+        end
 
-    for ch = 1:length(channels_to_image)
-        channel_to_image = channels_to_image{ch};
-        %get filenames and put them into a strucure
-        images0 = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
-
-        images.(channel_to_image) = images0.(channel_to_image);
+        %Make average time value for all channels at one position and time
+        time_vals = zeros(size(time_valsCH.(channels_to_image{1})));
+        for ch = 1:length(channels_to_image)
+            time_vals = time_vals + time_valsCH.(channels_to_image{ch});
+        end
+        time_vals = time_vals/length(channels_to_image);
+        channel_to_image = channels_to_image; %convert back to cell so that subsequent subroutines recognize there are two channels. 
+        
+    else 
+               
+        %get filenames for 1 FOV and put them into a strucure
+        images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan); 
+    
         %get times
-        [time_inds, time_valsCH.(channel_to_image)] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
-        %time_inds should be the same - time vals might be slightly
-        %different
-    end
-
-    %Make average time value for all channels at one position and time
-    time_vals = zeros(size(time_valsCH.(channels_to_image{1})));
-    for ch = 1:length(channels_to_image)
-        time_vals = time_vals + time_valsCH.(channels_to_image{ch});
+        [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc); % this is just for 1 position
+    
     end
     time_vals = time_vals/length(channels_to_image);
      
