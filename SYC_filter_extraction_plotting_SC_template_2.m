@@ -74,7 +74,7 @@ clf
 clear t_singlecell_cell; clear y_singlecell_cell;
 hold on
 %%%% specify channel name %%%%
-channel = ''; %'RFP'
+channel = 'RFP'; %'RFP'
 
 well_order = well_order;
 %condNames = {'GD', 'GD1', 'OS', 'ZM', 'PH'};
@@ -102,8 +102,8 @@ for jj = 1:Nwells
     totCellNum = featStructCell(jj).hasPeakNum+featStructCell(jj).zeroPeakNum;
     text(1,1,['CellNum: ',num2str(totCellNum)])
     %%%% specify x and y range of plot %%%%
-    axis([0,100,0,6])
-    title(condNames{jj})
+    axis([0,120,0,12])
+    title(well_order{jj})
 end
 suptitle(save_img_file(1).filename);
 print([base_dir, save_img_file(1).filename,'.eps'], '-depsc')
@@ -272,16 +272,16 @@ for jj = 1:numWells
 end
 
 figure(11); 
-subplot(2,3,1); distributionPlot(maxHeightVecCell,'distWidth',0.9, 'addSpread',0, 'showMM',5,'xNames',condNames, 'yLabel', ' (nuc/cyt)'); title('Maximum Height')
-subplot(2,3,2); distributionPlot(maxHeightTimeVecCell,'distWidth',0.9,'addSpread',0,'showMM',5,'xNames',condNames, 'yLabel', '(min)'); title('Maximum Height Time');
-subplot(2,3,3); distributionPlot(pulseWidthVecCell,'distWidth',0.9,'addSpread',0,'showMM',5,'xNames',condNames, 'yLabel', '(min)'); title('Pulse Width');
-subplot(2,3,4); distributionPlot(offSlopeVecCell,'distWidth',0.9,'addSpread',0,'showMM',5,'xNames',condNames, 'yLabel', '(nuc/cyt per 2min)'); title('Off Slope');
-subplot(2,3,5); distributionPlot(onSlopeVecCell,'distWidth',0.9,'addSpread',0,'showMM',5,'xNames',condNames, 'yLabel', '(nuc/cyt per 2min)'); title('On Slope');
+subplot(2,3,1); distributionPlot(maxHeightVecCell,'distWidth',0.9, 'addSpread',0, 'showMM',5,'xNames',well_order, 'yLabel', ' (nuc/cyt)'); title('Maximum Height')
+subplot(2,3,2); distributionPlot(maxHeightTimeVecCell,'distWidth',0.9,'addSpread',0,'showMM',5,'xNames',well_order, 'yLabel', '(min)'); title('Maximum Height Time');
+subplot(2,3,3); distributionPlot(pulseWidthVecCell,'distWidth',0.9,'addSpread',0,'showMM',5,'xNames',well_order, 'yLabel', '(min)'); title('Pulse Width');
+subplot(2,3,4); distributionPlot(offSlopeVecCell,'distWidth',0.9,'addSpread',0,'showMM',5,'xNames',well_order, 'yLabel', '(nuc/cyt per 2min)'); title('Off Slope');
+subplot(2,3,5); distributionPlot(onSlopeVecCell,'distWidth',0.9,'addSpread',0,'showMM',5,'xNames',well_order, 'yLabel', '(nuc/cyt per 2min)'); title('On Slope');
 suptitle(save_img_file(3).filename);
 
 set(gcf, 'PaperPositionMode', 'manual')
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [2.5 2.5 10 10])
-print([base_dir, save_img_file(3), '.eps'], '-depsc')
+print([base_dir, save_img_file(3).filename, '.eps'], '-depsc')
 
 end
