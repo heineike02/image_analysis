@@ -1,4 +1,4 @@
-function [] = SYC_filter_extraction_plotting_SC_template_2(base_dir, experi_name, well_order, phases, save_img_file)
+function [] = SYC_filter_extraction_plotting_SC_template_2(base_dir, experi_name, well_order, phases, save_img_file,plotVars)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This Script plots the same summary plots as for each of the experiments
 
@@ -87,7 +87,7 @@ for jj = 1:Nwells
     all_tracks = trackVecs{jj};
     all_times = timeVecs{jj};
     %subplot(1,2,jj)
-    subplot(2,3,jj);
+    subplot(num_subplots,num_subplots,jj);
     for ph = 1: length(phases) % loop through pre and post % is this defined??
         
         tracks = all_tracks.(phases{ph}); size(tracks)
@@ -102,11 +102,12 @@ for jj = 1:Nwells
     totCellNum = featStructCell(jj).hasPeakNum+featStructCell(jj).zeroPeakNum;
     text(1,1,['CellNum: ',num2str(totCellNum)])
     %%%% specify x and y range of plot %%%%
-    axis([0,120,0,12])
+    axis(plotVars.axis)
+
     title(well_order{jj})
 end
 suptitle(save_img_file(1).filename);
-print([base_dir, save_img_file(1).filename,'.eps'], '-depsc')
+%print([base_dir, save_img_file(1).filename,'.eps'], '-depsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % Plotting single cell plots with peaks indicated
@@ -212,7 +213,7 @@ set(gca, 'xticklabel', well_order)
 %xlabel('TRs'); ylabel('Number of Cells (count)')
 legend(strsplit(num2str(diffPeaks)))
 %title('Proportion of Number of Peaks Msn2')
-print([base_dir, save_img_file(2).filename], '-depsc')
+%print([base_dir, save_img_file(2).filename], '-depsc')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% FIRST PEAK ONLY:
@@ -282,6 +283,10 @@ suptitle(save_img_file(3).filename);
 set(gcf, 'PaperPositionMode', 'manual')
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [2.5 2.5 10 10])
+<<<<<<< HEAD
 print([base_dir, save_img_file(3).filename, '.eps'], '-depsc')
+=======
+%print([base_dir, save_img_file(3).filename, '.eps'], '-depsc')
+>>>>>>> 5d201d34eae7a32adebae629810fdc1465233c5d
 
 end

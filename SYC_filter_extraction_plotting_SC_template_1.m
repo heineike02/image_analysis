@@ -1,4 +1,4 @@
-function [] = SYC_filter_extraction_plotting_SC_template_1(ipdir, base_dir, phases, fname_load, well_order, perturbation,Xper)
+function [] = SYC_filter_extraction_plotting_SC_template_1(ipdir, base_dir, phases, fname_load, well_order, perturbation,Xper, smoothFn)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This function:
@@ -155,13 +155,13 @@ Nwells_t_singleCell = t_singlecell_cell(:,1);
 %%%% 'nf' = nuclear localization %%%%
 var_to_plot = 'nf';
 %%%% 1 = smooth, 0 = don't smooth %%%%
-smoothFn.flag = 1;
+%smoothFn.flag = 1;
 %%%% method for smoothing, see smooth function for more options %%%%
 %smoothFn.method = 'sgolay';
-smoothFn.method = 'lowess';
+%smoothFn.method = 'moving';
 %%%% the window of smoothing, value found empirically %%%%
 %smoothFn.span = 0.4; % span of 40%
-smoothFn.span = 5;
+%smoothFn.span = 30;
 
 % Smoothes and extracts features from single cell traces
 % loop through each well
@@ -181,7 +181,7 @@ for ii = 1:length(Nwells_singleCell)
         display(strcat('This is cell: ', num2str(kk)))
         
         %%%% threshold for peakfinder function, empirically derived %%%%
-        peakFindr.Sel = 0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
+        peakFindr.Sel = 0.1;%0.1; %0.08; % <-- this is the golden parameter for best peak detection %(max(singleCells1.nf) - min(singleCells1.nf))/8; %nanmean(singleCells1.nf)% + 0.125*nanstd(singleCells1.nf); % wiggle these 2 parameters
         %%%% in peakfinder function, lower bound of peak %%%%
         peakFindr.Thresh = 1.5;
         %%%% empirically derived, only change if want to lower the threshold %%%%
