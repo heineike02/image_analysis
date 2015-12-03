@@ -89,10 +89,10 @@ for ii = 1:length(all_tracks_vec)
         all_tracks_filt.(phases{jj}) = filtered_tracks_struct;
         all_times_filt.(phases{jj}) = timevals;
         
-        visual check
-        if jj == 2
-           figure; histogram(track_lengths(indc_of_tracks));
-        end  
+%         %visual check
+%         if jj == 2
+%            figure; histogram(track_lengths(indc_of_tracks));
+%         end  
         
     end
     
@@ -155,13 +155,13 @@ Nwells_t_singleCell = t_singlecell_cell(:,1);
 %%%% 'nf' = nuclear localization %%%%
 var_to_plot = 'nf';
 %%%% 1 = smooth, 0 = don't smooth %%%%
-%smoothFn.flag = 1;
+smoothFn.flag = 0;
 %%%% method for smoothing, see smooth function for more options %%%%
 %smoothFn.method = 'sgolay';
-%smoothFn.method = 'moving';
+smoothFn.method = 'moving';
 %%%% the window of smoothing, value found empirically %%%%
 %smoothFn.span = 0.4; % span of 40%
-%smoothFn.span = 30;
+smoothFn.span = 30;
 
 % Smoothes and extracts features from single cell traces
 % loop through each well

@@ -5,7 +5,11 @@
 
 % %plot the tracks on top of image - make sure reasonable cells were found
 % im = imread('RFP_p4_t1.tiff');
-% figure; imshow(im,[]); hold on; count=0; for i = 1:length(all_tracks); if length(all_tracks_vec{1}.Post(i).Cyloc)>0.8*40; plot(all_tracks_vec{1}.Post(i).Cyloc,all_tracks_vec{1}.Post(i).Cxloc, 'g'); hold on; count=count+1; end; end;
+% figure; imshow(im,[]);
+% hold on;
+% for i = 1:length(all_tracks_vec{1}.One)
+% plot(all_tracks_vec{1}.One(i).Cyloc(1),all_tracks_vec{1}.One(i).Cxloc(1), 'g.'); hold on;
+% end
 % title(['Dot6: P4: ',num2str(count), ' cells: 80% max trace length'])
 
 % plot peak finding traces

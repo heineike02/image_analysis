@@ -283,10 +283,7 @@ suptitle(save_img_file(3).filename);
 set(gcf, 'PaperPositionMode', 'manual')
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [2.5 2.5 10 10])
-<<<<<<< HEAD
-print([base_dir, save_img_file(3).filename, '.eps'], '-depsc')
-=======
+
 %print([base_dir, save_img_file(3).filename, '.eps'], '-depsc')
->>>>>>> 5d201d34eae7a32adebae629810fdc1465233c5d
 
 end

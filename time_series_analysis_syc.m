@@ -42,7 +42,7 @@ for nn = 1:positions
     pos_fnames_nn = pos_fnames{nn}; % looping through each field of view
     
     if length(channels_to_image) == 2 % if there are 2 channels
-        channels_to_image = channel_to_image;
+        channels_to_image = channels_to_image;
         for ch = 1:length(channels_to_image)
             channel_to_image = channels_to_image{ch};
             %get filenames and put them into a strucure
