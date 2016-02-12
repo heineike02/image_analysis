@@ -103,6 +103,7 @@ for jj = 1:Nwells
     text(1,1,['CellNum: ',num2str(totCellNum)])
     %%%% specify x and y range of plot %%%%
     axis(plotVars.axis)
+
     title(well_order{jj})
 end
 suptitle(save_img_file(1).filename);
@@ -282,6 +283,7 @@ suptitle(save_img_file(3).filename);
 set(gcf, 'PaperPositionMode', 'manual')
 set(gcf, 'PaperUnits', 'inches');
 set(gcf, 'PaperPosition', [2.5 2.5 10 10])
+
 %print([base_dir, save_img_file(3).filename, '.eps'], '-depsc')
 
 end

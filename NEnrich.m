@@ -4,7 +4,7 @@ function [nf,nmi]=NEnrich(im,circ, rad, ne_pixels)
 siz=size(im,1);
     %Why use a convolution (which reverses and shifts something) instead of
     %a cross-correlation which just shifts?
-    a=conv2(im,circ,'same');
+    a=conv2(double(im),double(circ),'same');
     
     [in,xy]=max(a(:));
     yloc=(mod(xy-1,siz(1))+1);
