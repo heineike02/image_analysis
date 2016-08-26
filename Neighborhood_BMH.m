@@ -1,4 +1,4 @@
-function [cellstruct] = Neighborhood_SYC(Cxloc, Cyloc, tim)
+function [cellstruct] = Neighborhood_BMH(Cxloc, Cyloc, tim)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %-Cyloc and Cxloc are information about the xy locations
 %-tim are the frame indices

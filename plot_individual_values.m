@@ -6,7 +6,7 @@ for nn = 1:length(tracks)
    if isempty(channel)
       y_vec = [tracks(nn).(val_to_plot)];
    else
-      y_vec = [tracks(nn).(val_to_plot).(channel)];
+      y_vec = [smooth(tracks(nn).(val_to_plot).(channel))];
    end
    time_inds = tracks(nn).times;
    t_vec = timevals(time_inds);
