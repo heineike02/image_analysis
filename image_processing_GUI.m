@@ -22,7 +22,7 @@ function varargout = image_processing_GUI(varargin)
 
 % Edit the above text to modify the response to help run_image_processing
 
-% Last Modified by GUIDE v2.5 26-Jul-2015 22:48:59
+% Last Modified by GUIDE v2.5 03-Oct-2016 12:56:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -633,10 +633,15 @@ function generate_metadata_parsed_Callback(hObject, eventdata, handles)
 metadata_conv_fname = [handles.ipdir,'times_from_umanager_metadata.py'];
 phases = handles.phases;
 imdir_phase = handles.imdir_phase;
+custom_NFrames = handles.custom_NFrames;
 for ph = [1:length(phases)]
       phase = phases{ph};
       imdir = imdir_phase.(phase);
-      system(['python ', metadata_conv_fname, ' ', imdir]);
+      if isempty(custom_NFrames)
+        system(['python ', metadata_conv_fname, ' ', imdir]);
+      else
+        system(['python ', metadata_conv_fname, ' ', imdir, ' ', int2str(custom_NFrames(ph))]);
+      end
 end
 
 'parsed metadata files generated'
@@ -830,8 +835,8 @@ function load_phase_table_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-phase_table_data = get(handles.phase_table,'Data')
-Nphases = find(1-strcmp('',{phase_table_data{1,:}}), 1, 'last' );
+phase_table_data = get(handles.phase_table,'Data');
+Nphases = max(find(cellfun('isempty',{phase_table_data{1,:}})==0));
 phases = {phase_table_data{1,1:Nphases}};
 handles.phases = phases;
 
@@ -841,6 +846,7 @@ end
 handles.imdir_phase = imdir_phase;
 
 handles.shift_timing = [phase_table_data{3,1:Nphases}];
+handles.custom_NFrames = [phase_table_data{5,1:Nphases}];
 
 for jj = 1:length(phases);
     time_calc_phase_jj = phase_table_data{4,jj};
@@ -856,6 +862,7 @@ handles.phases
 handles.imdir_phase
 handles.shift_timing
 handles.time_calc_phase
+handles.custom_NFrames
 'phase data loaded'
 
 set(handles.uipanel3,'Visible','on')
@@ -1207,3 +1214,4 @@ end
 set(handles.posvec_table,'Data',posvec);
 
 guidata(hObject, handles)
+

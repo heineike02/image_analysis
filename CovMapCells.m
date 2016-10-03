@@ -31,6 +31,8 @@ N = length(images.(channels_to_image{1}));
 
 if N ~= length(time_vals)
     'Warning: times not the same size as number of images.  This will occur if you removed bad images from the source directory and the metadata no longer matches the number of files'
+    'Set N to match number of time points in metadata'
+    N = length(time_vals)
     %return
 end
 
