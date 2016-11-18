@@ -49,18 +49,18 @@ all_times_vec = [all_times_vec_75_78, all_times_vec_55];
 %% RFP channel 
 
 channel = 'RFP'
-legend_vec_RFP = {'TPK2-AS', 'TPK2/3-AS +Cas9','TPK2/3-AS','TPK2-AS SDC','TPK2/3-AS +Cas9 SDC','TPK2/3-AS SDC','WT', 'WT SDC'}
+legend_vec_RFP = {'TPK2-AS', 'TPK2/3-AS +Cas9','TPK2/3-AS','TPK2-AS SDC','TPK2/3-AS +Cas9 SDC','TPK2/3-AS SDC','WT NMPP1', 'WT SDC'}
 cmap_RFP = [       0,0,0.5;  %light Blue
      0,0,0.5;  %light Blue
-     0,0,0.5;  %light Blue
+     0,0,1;  %light Blue
     0,0,0;  %black
     0,0,0;  %black
     0,0,0;  %black
-    0,0,0.5;  %light Blue
+    0,1,0;  %green
     0,0,0;  %black
           ];  
 
-linestyle_vec_RFP = {'--','-.','-','--','-.','-',':',':'}
+linestyle_vec_RFP = {'--','-.','-','--','-.','-','-','-'}
 marker_vec_RFP = {'None','None','None','None','None','None','None','None'}
 
 %KL.MSN2 for all strains
@@ -70,7 +70,7 @@ hold on
 
 %cmap = jet(length(legend_vec_RFP));
 %perm = 1:length(legend_vec_RFP);
-perm = [3,7,6,8];
+perm = [8,3,7];
 N_RFP = length(perm);
 
 legend_vec_RFP_plot = legend_vec_RFP(perm);
