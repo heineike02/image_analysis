@@ -44,8 +44,8 @@ suptitle('Dot6: P1: Peak Finding with Med+sel(0.1) threshold');
 %%
 % 2. filter the traces
 % Dot6
-ipdir = '/Users/susanychen/Documents/image_analysis';
-base_dir = '/Users/susanychen/Downloads/tempData20150820/';
+ipdir = '/Users/susanychen/GITREPOS/image_analysis2/';
+base_dir = '/Users/susanychen/20150820_TR_7StressInputs/';
 phases = {'Post'};
 fname_load = 'Dot6_7StressInputs';
 well_order = {'GD 0.05%','1M Sorb','ND', 'ND+AAD', '200ug/ml Zymo','Pi-deplete', 'pH8.7','SDC'};
@@ -82,7 +82,159 @@ smoothFn.span = 30;
 smoothFn.flag = 1;
 SYC_filter_extraction_plotting_SC_template_1(ipdir, base_dir, phases, fname_load, well_order, perturbation, perMaxLength, smoothFn);
 %%
+%% Plot raw mean traces
+%% SC.Msn2-RFP Mean Time Traces
 
+addpath('/Users/susanychen/GITREPOS/image_analysis2')
+
+% Dot6
+figure(1)
+clf
+hold on
+channel = 'RFP'
+legend_vec_RFP = {'GD 0.05%','1M Sorb','ND','ND+AAD','200ug/ml Zymo',...
+    'Pi-deplete','pH8.7'};
+
+base_dir = '/Users/susanychen/20150820_TR_7StressInputs/';
+fname_save = 'Dot6_7StressInputs.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+cmap_RFP = [ 0,0,1;  %Blue
+    1,0,0; %Red
+    0,1,0;
+    1,1,0;
+    0,0,0;
+    0,1,1;
+    1,0.5,1];  
+
+%cmap = jet(length(legend_vec_RFP));
+%perm = 1:length(legend_vec_RFP);
+phases = {'Post'};
+perm = [1,2,3,4,5,6,7];
+N_RFP = length(perm)
+legend_vec_RFP_plot = legend_vec_RFP(perm);
+cmap = cmap_RFP(perm,:);
+plot_params = {'linewidth',5,'LineStyle','-'};
+plt_grp = zeros(length(legend_vec_RFP_plot),1);
+for jj = 1:length(perm)
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        timevals = all_times.(phases{ph});
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+hleg = legend(plt_grp,legend_vec_RFP_plot) %,'Location','NE');
+%htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('Dot6 Localization Stress Panel')
+xlabel('Time (min)')
+ylabel('Nuclear Localization (nuc/cyt)')
+axis([0 120 1 8])
+
+% Maf1
+figure(2)
+clf
+hold on
+channel = 'RFP'
+legend_vec_RFP = {'GD 0.05%','1M Sorb','ND','ND+AAD','200ug/ml Zymo',...
+    'Pi-deplete','pH8.7'};
+
+base_dir = '/Users/susanychen/20150820_TR_7StressInputs/';
+fname_save = 'Maf1_7StressInputs.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+cmap_RFP = [ 0,0,1;  %Blue
+    1,0,0; %Red
+    0,1,0;
+    1,1,0;
+    0,0,0;
+    0,1,1;
+    1,0.5,1];  
+
+%cmap = jet(length(legend_vec_RFP));
+%perm = 1:length(legend_vec_RFP);
+phases = {'Post'};
+perm = [1,2,3,4,5,6,7];
+N_RFP = length(perm)
+legend_vec_RFP_plot = legend_vec_RFP(perm);
+cmap = cmap_RFP(perm,:);
+plot_params = {'linewidth',5,'LineStyle','-'};
+plt_grp = zeros(length(legend_vec_RFP_plot),1);
+for jj = 1:length(perm)
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        timevals = all_times.(phases{ph});
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+hleg = legend(plt_grp,legend_vec_RFP_plot) %,'Location','NE');
+%htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('Maf1 Localization Stress Panel')
+xlabel('Time (min)')
+ylabel('Nuclear Localization (nuc/cyt)')
+axis([0 120 1 8])
+
+% Pho4
+figure(3)
+clf
+hold on
+channel = 'RFP'
+legend_vec_RFP = {'GD 0.05%','1M Sorb','ND','ND+AAD','200ug/ml Zymo',...
+    'Pi-deplete','pH8.7'};
+
+base_dir = '/Users/susanychen/20150820_TR_7StressInputs/';
+fname_save = 'Pho4_7StressInputs.mat';
+load([base_dir,fname_save],'all_times_vec','all_tracks_vec','posvec')
+cmap_RFP = [ 0,0,1;  %Blue
+    1,0,0; %Red
+    0,1,0;
+    1,1,0;
+    0,0,0;
+    0,1,1;
+    1,0.5,1];  
+
+%cmap = jet(length(legend_vec_RFP));
+%perm = 1:length(legend_vec_RFP);
+phases = {'Post'};
+perm = [1,2,3,4,5,6,7];
+N_RFP = length(perm)
+legend_vec_RFP_plot = legend_vec_RFP(perm);
+cmap = cmap_RFP(perm,:);
+plot_params = {'linewidth',5,'LineStyle','-'};
+plt_grp = zeros(length(legend_vec_RFP_plot),1);
+for jj = 1:length(perm)
+    all_tracks = all_tracks_vec{perm(jj)};
+    all_times = all_times_vec{perm(jj)};
+    color_val = cmap(jj,:);
+    plt_grp(jj) = hggroup;
+    for ph = 1: length(phases)
+        tracks = all_tracks.(phases{ph});
+        timevals = all_times.(phases{ph});
+        p = plot_meanvalues(timevals,tracks,channel,color_val,0,'nf','plot_params',plot_params);
+        set(p,'Parent',plt_grp(jj))
+    end
+end
+
+hleg = legend(plt_grp,legend_vec_RFP_plot) %,'Location','NE');
+%htitle = get(hleg,'Title');
+%set(htitle,'String','Condition')
+title('Pho4 Localization Stress Panel')
+xlabel('Time (min)')
+ylabel('Nuclear Localization (nuc/cyt)')
+axis([0 120 1 8])
+
+%%
 % 3. 4. 5. 6. plot the different traces/characteristics
 save_img_file(1).filename = 'Dot6 Single Cell Traces';
 save_img_file(2).filename = 'Dot6 Proportion Peak Number';

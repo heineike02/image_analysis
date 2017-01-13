@@ -1,4 +1,4 @@
-function [all_tracks, all_times] = time_series_analysis(analysis_params)
+function [all_tracks, all_times, timecoursedata] = time_series_analysis(analysis_params)
 % Code for quantifying KL or SC nuclear localization using 1x or 1.5x
 % optical zoom.  
 % Change jacobs image code output to sort in image order. 

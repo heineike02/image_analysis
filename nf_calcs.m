@@ -16,8 +16,14 @@ for kk = 1:nTimes
             nf_vec(jj) = track_nfs(time_match);
         end
         nf_vec = nf_vec(nf_vec>0);
-        mean_nf(kk) = mean(nf_vec);
-        std_nf(kk) = std(nf_vec);
+        
+        % median and interquartile range
+        mean_nf(kk) = median(nf_vec);
+        std_nf(kk) = iqr(nf_vec);
+        % mean and standard deviation
+        %mean_nf(kk) = mean(nf_vec);
+        %std_nf(kk) = std(nf_vec);
     end
 
+end
 end
