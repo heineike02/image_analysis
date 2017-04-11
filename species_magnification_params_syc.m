@@ -36,11 +36,11 @@ elseif strcmp(op_amp,'1p5x')
         std_thresh = 0.16;
     elseif strcmp(species,'SC')
         %load image of S.Cerevisiae cell (made by Jacob)
-        load([ipdir,'circSC_1p5x.mat'])
+        load([ipdir,'circSC_1p5x_syc.mat'])
         circ_out = circ;
-        siz = [25,25];
+        siz = [25,25]; %[25,25];
         rad = 11;
-        std_thresh = 0.2;
+        std_thresh = 0.2; %0.2;
     else
         'Error - incorrect species name'
     end

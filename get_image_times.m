@@ -1,4 +1,4 @@
-function [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc)
+function [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc,usedLED)
 %time_calc:  Tells the program how to calculate each time value.  If the
 %input is a number, then that is interpreted as a dt between images.  If
 %the input is a filename, then that is interpreted as metadata that gives
@@ -15,7 +15,12 @@ elseif ischar(time_calc) % either JSO or Micromanager
        metadata = regexp(importdata(time_calc),'\t','split');
        time_fnames = cell(size(metadata));
        for jj = 1:length(metadata)
-            time_fnames{jj} = metadata{jj}{9};
+           if usedLED
+                time_fnames{jj} = metadata{jj}{11}; % if led is used, will un-hard code soon
+           else
+                time_fnames{jj} = metadata{jj}{9}; % if NO LED
+           end
+
        end
    
        for jj = 1:nTimes % time that corresponds to the t# for 1 well

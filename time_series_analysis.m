@@ -38,9 +38,12 @@ positions = length(pos_fnames);
 Nchan = length(channels);
 
 for nn = 1:positions
-    thePos = nn % TEST
     pos_fnames_nn = pos_fnames{nn}; % looping through each field of view
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 3f136507fa15d551e3079b089f79bee987686f41
     for ch = 1:length(channels_to_image)
         channel_to_image = channels_to_image{ch};
         %get filenames and put them into a strucure

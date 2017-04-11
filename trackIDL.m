@@ -36,9 +36,12 @@ xyzs = zeros(maxcells*nFrames, 3+2*nChan);
 
 mm = 1; 
 for jj = 1:length(timecoursedata)
+    %strcat('jj = ', int2str(jj))
     celldata = timecoursedata(jj).celldata;
     nCells = length(celldata);
     for kk = 1:nCells
+        %strcat('mm = ', int2str(mm))
+        %strcat('kk = ', int2str(kk))
         xyzs(mm,1) = celldata(kk).Cxloc.Combined;
         xyzs(mm,2) = celldata(kk).Cyloc.Combined;
         for nn = 1:nChan

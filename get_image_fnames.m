@@ -2,7 +2,7 @@ function images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_
 
 if strcmp(fname_conv,'JSO')
     images = struct();
-    files=dir(char(strcat(imdir,channel_to_image,'_',pos_fnames_nn,'_t*.tiff'))); 
+    files=dir(char(strcat(imdir,channel_to_image,'-wheel_',pos_fnames_nn,'_t*.tiff'))); 
     nTimes = size(files,1);
 
     %Get initial number
@@ -15,8 +15,12 @@ if strcmp(fname_conv,'JSO')
     %This is a pain because the numbering is not 01,02,03 and
     %messes up the ordering of the files. 
     images_cell = cell(1,nTimes);
-    for mm = 1:nTimes 
-       fname = char(strcat(channel_to_image,'_',pos_fnames_nn,'_t',int2str(channel_mod+(mm-1)*Nchan),'.tiff'));
+    for mm = 1:nTimes  
+       %Nchan should be an input automatically calculated -
+       %analysis_parameters.channels should be a cell with all the channels
+       %you want. 
+       %Nchan = 2; % if only want the results of 1 color, but imaged in 2 colors
+       fname = char(strcat(channel_to_image,'_',pos_fnames_nn,'_t',int2str(channel_mod+(mm-1)*Nchan),'.tiff')); 
        images_cell{mm} = fname;
     end
     images.(channel_to_image) = images_cell;

@@ -10,7 +10,7 @@ from datetime import datetime
 #change the number of frames in the metadata file (find and replace "Frames": N) There
 #is a powershell routine for this named FrameNoShift.ps1
 
-#imdirbase = 'C:\\Users\\Ben\\Documents\\Data\\PKA_project\\20140709_37_38_39_sorb_p5M\\Pre\\'
+#imdirbase = 'C:\\Users\\Ben\\Documents\\Data\\PKA_project\\20150821_52_60_76_nmpp1_osmo\\Post\\'
 
 imdirbase = sys.argv[1]
 
