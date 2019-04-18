@@ -1,4 +1,4 @@
-function [all_tracks, all_times] = time_series_analysis(analysis_params)
+function [all_tracks, all_times, timecoursedata] = time_series_analysis(analysis_params)
 % Code for quantifying KL or SC nuclear localization using 1x or 1.5x
 % optical zoom.  
 % Change jacobs image code output to sort in image order. 
@@ -39,7 +39,11 @@ Nchan = length(channels);
 
 for nn = 1:positions
     pos_fnames_nn = pos_fnames{nn}; % looping through each field of view
+<<<<<<< HEAD
+    
+=======
 
+>>>>>>> 3f136507fa15d551e3079b089f79bee987686f41
     for ch = 1:length(channels_to_image)
         channel_to_image = channels_to_image{ch};
         %get filenames and put them into a strucure

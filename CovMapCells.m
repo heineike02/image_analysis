@@ -74,7 +74,23 @@ for jj = 1:N
     %celldata = match_two_channels(celldataCH.(channels{1}),channels{1},celldataCH.(channels{2}),channels{2},L);
     %My algorithm breaks on 20140703 A11_site1.  
     if length(channels_to_image)==2
+        %if length(channels_to_image)==1
+            %makes celldata have a channel field if there is only one channel
+            %to remain consistant with multiple channel image data structure.
+%             channel = channels_to_image{2};
+%             celldata_new = struct();
+%             for mm = 1:length(celldata.(channel));
+%                 celldata_fields = fields(celldata.(channel));
+%                     for kk = 1:length(celldata_fields)
+%                         celldata_new(mm).(celldata_fields{kk}).(channel) = celldata.(channel)(mm).(celldata_fields{kk});
+%                     end
+%                 celldata_new(mm).Cxloc.Combined = celldata_new(mm).Cxloc.(channel); 
+%                 celldata_new(mm).Cyloc.Combined = celldata_new(mm).Cyloc.(channel);
+%             end 
+%             celldata = celldata_new;
+        
         celldata = match_two_channels_Hung(celldata.(channels_to_image{1}),channels_to_image{1},celldata.(channels_to_image{2}),channels_to_image{2},L);
+        
         %Make this function handle a situation where no cells are detected.
     elseif length(channels_to_image)==1
         %makes celldata have a channel field if there is only one channel
@@ -90,6 +106,7 @@ for jj = 1:N
             celldata_new(mm).Cyloc.Combined = celldata_new(mm).Cyloc.(channel);
         end 
         celldata = celldata_new;
+        
     else
         error('NchanError','more than three channels not yet supported')
     end

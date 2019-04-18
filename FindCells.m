@@ -73,7 +73,7 @@ imcs=(ima./conv2(ima,ones(coarse_smooth),'same'));
 %imagesc(imc)
 imc=conv2(imcs,ones(local_smooth),'same');
 %find possible locations of cells with generous threshold
-%threshold is median plus twice the mean absolute deviation. 
+%threshold is median plus thresh* the mean absolute deviation. 
 thr=median(imc(:))+thresh*mad(imc(:));
 
 imsize = size(im);

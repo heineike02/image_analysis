@@ -42,7 +42,7 @@ val_to_plot = 'nf';
 base_dir = 'C:\Users\susanychen\Google Drive\UCSF Graduate Research (El-Samad)\DECODING PKA BY DOWNSTREAM EFFECTORS\20150914_light-mediated_shuttling_NLSvar3-29\';
 experi_name = fname_load;
 load([base_dir,experi_name])
-
+%%
 phases = {'Three','Five','Eight','Nine','Eleven', 'Fourteen','Fifteen','Twenty','TwentySeven','TwentyNine','TwentyFour','Original'};
 
 well_order = {'NLSvar#3','NLSvar#5','NLSvar#8','NLSvar#9','NLSvar#11','NLSvar#14','NLSvar#15','NLSvar#20','NLSvar#27','NLSvar#29','NLSvar#24','Original'};
@@ -101,4 +101,4 @@ for jj = 1:Nfolders
     title(sample_order{jj})
 end
 suptitle(save_img_file(1).filename);
-print([base_dir, save_img_file(1).filename, ' 20150916 LogOD','.eps'], '-depsc')
+%print([base_dir, save_img_file(1).filename, ' 20150916 LogOD','.eps'], '-depsc')

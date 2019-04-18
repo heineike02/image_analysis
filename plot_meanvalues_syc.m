@@ -26,7 +26,8 @@ if std_flag == 1
     hold on
 end
 %fig_out = plot(timevals,mean_val,'Color',color_val,plot_params{:}); % change color or linewidth to adjust mean line
-fig_out = errorbar(timevals,mean_val,std_val,'Color',color_val,plot_params{:});
+%fig_out = errorbar(timevals,mean_val,std_val,'Color',color_val,plot_params{:});
+fig_out = shadedErrorBar(timevals, mean_val, std_val);
 
 axis(axisVals)
 %xlabel('time(min)')

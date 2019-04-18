@@ -3,6 +3,8 @@
 % run the find cells script for only 1 well -- this is done with
 % SCY_img_analysis_20150820_Dot6_7StressInputs_1SDC.m for example
 
+addpath('/Users/susanychen/GITREPOS/image_analysis2');
+
 % %plot the tracks on top of image - make sure reasonable cells were found
 im = imread('RFP_p1_t32.tiff');
 figure; imshow(im,[]);
@@ -164,16 +166,28 @@ theAxis{1} = [0 12 1.5 18];
 %theAxis{9} = [0 8 1.5 3];
 %theAxis{10} = [0 4 1.5 3];
 %theAxis{11} = [0 2 1.5 3];
-for jj = 7:11%Nfolders
+% for plotting specific subplots
+
+% extract the max/min difference for a frequency vs localization plot (20170215)
+
+%meanHighLow = [];
+%stdHighLow = [];
+plotNums = [8,9,10];
+
+%valsStruct = struct();
+for jj = 1:length(plotNums)%7:11%Nfolders
     jj
-    all_tracks = all_tracks_vec{1}.(phases{jj});
-    all_times = all_times_vec{1}.(phases{jj});
+    % all_tracks = all_tracks_vec{1}.(phases{jj});
+    % all_times = all_times_vec{1}.(phases{jj});
+    all_tracks = all_tracks_vec{1}.(phases{plotNums(jj)});
+    all_times = all_times_vec{1}.(phases{plotNums(jj)});
 
     %subplot(num_subplots,num_subplots,jj);
-    subplot(2,5,jj-1);
+    %subplot(1,5,jj-6);
+    figure(plotNums(jj))
     
     % loop through single cells
-    hold all
+    %hold all
     xlabel('time(min)')
     ylabel('nuc enrich (nuc/cyt)')
 %     for nn = 1:length(all_tracks)
@@ -189,13 +203,23 @@ for jj = 7:11%Nfolders
 %        hold on;
 %     end
     color_val = cmap_RFP(jj,:);
+    p= plot_meanvalues_syc(all_times,all_tracks,channel,color_val,0,'nf', setAxisValues{jj}, 'plot_params',plot_params);
+    %[fig_out, timevals, mean_val, std_val] = plot_meanvalues_syc(all_times,all_tracks,channel,color_val,0,'nf', setAxisValues{jj}, 'plot_params',plot_params);
     
-    p = plot_meanvalues_syc(all_times,all_tracks,channel,color_val,0,'nf', setAxisValues{jj}, 'plot_params',plot_params)
     
+    %[maxVal, indxMax] = max(mean_val); [minVal, indxMin]=min(mean_val(postTime(jj-6):end));
+    %meanHighLow(jj) = maxVal - minVal;
+    %stdHighLow(jj) = sqrt(std_val(indxMax).^2 + std_val(postTime(jj-6)+indxMin).^2);
+
     %plot(all_times, defineLight(1).light, 'c-.', 'linewidth',4);
     
-    totCellNum = length(all_tracks);
-    text(0.5,2.25,['CellNum: ',num2str(totCellNum)])
+    %valsStruct(jj-6).mean = mean_val;
+    %valsStruct(jj-6).std = std_val;
+    
+    grid off
+    %totCellNum = length(all_tracks);
+    %text(0.5,2.25,['CellNum: ',num2str(totCellNum)])
+    
     %%%% specify x and y range of plot %%%%
     %if jj <=6
         %axis(theAxis{1});
@@ -204,6 +228,58 @@ for jj = 7:11%Nfolders
         %axis(theAxis{jj});
     %end
     
-    title(sample_order{jj})
+    title(sample_order{plotNums(jj)})
+    %title(sample_order{jj})
 end
 suptitle(save_img_file(1).filename);
+
+% %% extract the max/min difference for a frequency vs localization plot (20170215)
+% % imaging frequency is every 30secs
+% phases = {'seven','eight','nine','ten','eleven'};
+% begTime2Sample = [5,5,4,2,1]; %indices
+% endTime2Sample = [15,10,7,4,2]; %indices
+% 
+% highLowDiffMed = [];
+% highLowDiffStd = [];
+% for jj = 1:5
+%     %jj
+%     all_tracks = all_tracks_vec{1}.(phases{jj});
+%     all_times = all_times_vec{1}.(phases{jj});
+%     
+%     %highCount = []; % starts with light on, so localization is high
+%     %lowCount = [];
+%     %highLowDiff = [];
+%     rangeDiff = [];
+%     for ii = 1:length(all_tracks)
+%         %ii
+%         tracktime1 = all_tracks(ii).times;
+%         track1 = all_tracks(ii).nf.RFP;
+%         
+%         maxSingle = max(track1); minSingle = min(track1);
+%         rangeDiff(ii) = maxSingle - minSingle;
+%         %if find(tracktime1 == begTime2Sample(jj)) & find(tracktime1 == endTime2Sample(jj))
+%             %figure; plot(track1.RFP)
+%             %indxHigh = find(tracktime1 == begTime2Sample(jj));
+%             %indxLow = find(tracktime1 == endTime2Sample(jj));
+%             %highCount(ii) = track1.RFP(indxHigh);
+%             %lowCount(ii) = track1.RFP(indxLow);
+%             %highLowDiff(ii) = track1.RFP(indxHigh)-track1.RFP(indxLow);
+%         %end
+%     end
+%     %highLowDiffMed(jj) = nanmedian(highLowDiff);
+%     %highLowDiffStd(jj) = nanstd(highLowDiff);
+%     highLowDiffMed(jj) = nanmedian(rangeDiff);
+%     highLowDiffStd(jj) = nanstd(rangeDiff);
+% end
+
+%% extracting max min for freq plot
+%7-11
+meanVals = [0.45,0.55,0.48,0.43,0.17];
+maxIndx = [3 3 5 5 5];
+minIndx = [16 12 17 9 7];
+stdVals = [];
+for i = 1:5
+    stdVals(i) = sqrt(valsStruct(i).std(minIndx(i)).^2+valsStruct(i).std(maxIndx(i)).^2);
+end
+figure; shadedErrorBar([1/10, 1/6, 1/4, 1/2, 1/1],meanVals, stdVals); %errorbar([1/10, 1/6, 1/4, 1/2, 1/1],meanVals, stdVals);
+axis([0 1 0 0.8]);
