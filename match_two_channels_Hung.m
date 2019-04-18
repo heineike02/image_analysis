@@ -1,4 +1,4 @@
-function celldata = match_two_channels(celldata_1,channel_1,celldata_2,channel_2,L)
+function celldata = match_two_channels_Hung(celldata_1,channel_1,celldata_2,channel_2,L)
 %finds a correspondance between points for images of two different
 %channels
 
