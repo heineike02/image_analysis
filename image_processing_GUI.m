@@ -630,7 +630,11 @@ function generate_metadata_parsed_Callback(hObject, eventdata, handles)
 % hObject    handle to generate_metadata_parsed (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-metadata_conv_fname = [handles.ipdir,'times_from_umanager_metadata.py'];
+%
+% If you need to use a hack file because of some metadata naming issue here
+% is where you make the change: 
+metadata_conv_fname = [handles.ipdir,'times_from_umanager_metadata_20170110_hack.py'];
+%metadata_conv_fname = [handles.ipdir,'times_from_umanager_metadata.py'];
 phases = handles.phases;
 imdir_phase = handles.imdir_phase;
 custom_NFrames = handles.custom_NFrames;
