@@ -1,10 +1,10 @@
-function [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc,usedLED)
+function [time_inds, time_vals] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc,usedLED, channel_to_image_fieldname)
 %time_calc:  Tells the program how to calculate each time value.  If the
 %input is a number, then that is interpreted as a dt between images.  If
 %the input is a filename, then that is interpreted as metadata that gives
 %exact time values.  
 
-nTimes = length(images.(channel_to_image));
+nTimes = length(images.(channel_to_image_fieldname));
 time_inds = 1:nTimes;
 if isnumeric(time_calc)
    %method of calculating time is dt 
@@ -35,7 +35,8 @@ elseif ischar(time_calc) % either JSO or Micromanager
             time = str2double(metadata{metadata_ind}{1})/60.0; %in minutes
             time_vals(jj) = time;
        end
-elseif strcmp(fname_conv,'Micromanager')
+    elseif strcmp(fname_conv,'Micromanager')
+       imdir
        [~,Channel,~,Frame,Time] =  import_metadata_parsed([imdir,pos_fnames_nn,filesep,time_calc]);
        chan_ind = strcmp(Channel,channel_to_image);
        time_vals = Time(chan_ind);

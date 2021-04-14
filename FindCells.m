@@ -2,6 +2,17 @@ function celldata = FindCells(im, cell_find_params)
 %Note: imbg should be median filtered and converted to double to avoid
 %artifacts.
 
+%If Debug is true, then plot debug points
+debug = cell_find_params.debug;
+if debug
+    figure
+    clf 
+    hold on
+    imagesc(im)
+    plot(0,0,'rx')
+    title('Raw Image')
+end
+
 circ = cell_find_params.circ;
 imbg = cell_find_params.imbg;
 siz = cell_find_params.siz;
@@ -59,19 +70,39 @@ celldata(1:maxcells) = celldata(1);
 %load first image
 %im=double(imread([di,'\',char(files(in(i)).name)]));
 im = double(im);
-%normalize to background (be careful here, not always a good idea)
+%normalize to background (be careful here, not always a good idea - when
+%would it not be a good idea?)
 im=im./imbg;
 
-%deconvolute with kernal of ideal cell, to find cells as peaks DEBUG POINT
-%imagesc(ima)
+%deconvolute with kernal of ideal cell, to find cells as peaks 
+%DEBUG POINT
 ima=deconvlucy(im,circ,deconvlucy_iterations);
+if debug
+    figure
+    clf 
+    hold on
+    imagesc(ima)
+    plot(0,0,'rx')
+    title('Lucy Deconv image')
+end
+
+
         
 %smooth image heavily
 imcs=(ima./conv2(ima,ones(coarse_smooth),'same'));
 %smooth locally
-%%%originally this one didn't have 'same' - not sure why DEBUG POINT
-%imagesc(imc)
 imc=conv2(imcs,ones(local_smooth),'same');
+%%%originally this one didn't have 'same' - not sure why 
+%DEBUG POINT
+if debug
+    figure
+    clf 
+    hold on
+    imagesc(imc)
+    plot(0,0,'rx')
+    title('Deconv lucy image smoothed')
+end
+
 %find possible locations of cells with generous threshold
 %threshold is median plus thresh* the mean absolute deviation. 
 thr=median(imc(:))+thresh*mad(imc(:));
@@ -81,9 +112,17 @@ imsize = size(im);
 %find possible cell pixels
 [px,py]=find(imc>thr);
 
-%DEBUG POINT For troubleshooting all pixels above threshold
-%plot(py,px,'rx')
 
+%DEBUG POINT For troubleshooting all pixels above threshold
+if debug
+    figure
+    clf 
+    hold on
+    imagesc(im)
+    plot(py,px,'rx')
+    title('All Pixels above Threshold')
+end
+    
 %find local maxima to define cells
 %arguments: 
 %im - image to analyze
@@ -99,7 +138,17 @@ imsize = size(im);
 [maxx,maxy]=FindMaxima(ima,px,py,close_max,0,edge_margin);       
 %run again with far max removing duplicates. 
 [maxx,maxy]=FindMaxima(ima,maxx,maxy,far_max,1,edge_margin);
-% DEBUG POINT - check if duplicates are removed plot(maxy,maxx,'rx')
+% DEBUG POINT - check if duplicates are removed 
+
+if debug
+    figure
+    clf 
+    hold on
+    imagesc(im)
+    plot(maxy,maxx,'rx')
+    title('After duplicates removed')
+end
+
 
 
 %Sets up vectors to store cell coordinates
@@ -108,26 +157,35 @@ CylocT = zeros(maxcells,1);
 
 %go through putative cells, pull pixel region, analyze them
 
-%index for new vector of cells - will only keep cells if certain conditions
-%are met
+%index for new vector of cells - will only keep cells if they are:
+%
+% Far enough away from the edge
+%
+% (standard deviation / mean of the pixels) > std_thresh
+
 qr=0;
 xvec = [];
 yvec = [];
-for j=1:length(maxx);
-        yloc=maxy(j);
-        xloc=maxx(j);
-        %throws out cells that are too close to the edge
-        if (xloc + block_radius) <= imsize(1) & (xloc-block_radius) > 0 & (yloc + block_radius) <= imsize(2) & (yloc-block_radius)>0 
-           % DEBUG POINT - check to see if vaguely looks like cell (may be
-            % off center, should be bright pixel in center) imagesc(imb)
-            imb=GetBlock(im,block_radius,xloc,yloc);
-           %only keeps image if the standard deviation / mean of the pixels
-           %is greater than std_thresh
-           % DEBUG POINT - check to see if cell being thrown out, is number
-           % on left of > greater than std_thresh? NEED TO FIX - SHOULD BE
-           % EVALUATING AFTER CENTERING IMAGE
-           if std(imb(:))/mean(imb(:))>std_thresh
-             
+length(maxx)
+for j=1:length(maxx)
+    yloc=maxy(j);
+    xloc=maxx(j);
+    %throws out cells that are too close to the edge
+    if (xloc + block_radius) <= imsize(1) & (xloc-block_radius) > 0 & (yloc + block_radius) <= imsize(2) & (yloc-block_radius)>0 
+       % DEBUG POINT - check to see if vaguely looks like cell (may be
+       % off center, should be bright pixel in center) imagesc(imb)
+       imb=GetBlock(im,block_radius,xloc,yloc);
+       %only keeps image if the standard deviation / mean of the pixels
+       %is greater than std_thresh
+       % DEBUG POINT - check to see if cell being thrown out, is number
+       % on left of > greater than std_thresh? NEED TO FIX - SHOULD BE
+       % EVALUATING AFTER CENTERING IMAGE
+       %j
+       %std(imb(:))
+       %mean(imb(:))
+       %std_thresh
+       if std(imb(:))/mean(imb(:))>std_thresh
+            %['keeping cell ',int2str(j)] 
             %adjusts the location of the center using the single cell image
             xy = lcrosscorr(imb);
             yloc=yloc+(xy(2)-block_radius);
@@ -154,14 +212,24 @@ for j=1:length(maxx);
                     celldata(qr).nf = nf;
                     celldata(qr).nmi = nmi;                    
                 end
-                
+
             end
-           end
-        end
+       end
+    end
 end   
 
 %Shrink down celldata to fit number of cells
 celldata = celldata(1:qr);
+
+if debug
+    figure
+    clf 
+    hold on
+    imagesc(im)
+    plot([celldata.Cyloc],[celldata.Cxloc],'rx')
+    title('final found cells')
+end
+
 end
 
 

@@ -18,7 +18,7 @@ siz=size(im,1);
     dis=sqrt((xloc-matx(:)).^2+(yloc-maty(:)).^2);
     
     %nuclear enrichment is defined as the ratio of the intensity of the
-    %top five cells within the rad distance of the center of the image (where the 
+    %top [ne_pixels] (default is five) pixels within the rad distance of the center of the image (where the 
     %image is brightest) 
     %and the median intensity of the pixels within the rad distance.  
     ne=sort(im(dis<rad),'descend');

@@ -28,6 +28,7 @@ thresh = analysis_params.thresh;
 pos_fnames = analysis_params.pos_fnames;
 channels = analysis_params.channels;
 channels_to_image = analysis_params.channels_to_image;
+channels_to_image_fieldname = analysis_params.channels_to_image_fieldname;
 time_calc = analysis_params.time_calc;
 imbg = analysis_params.imbg;
 maxcells = analysis_params.maxcells;
@@ -37,31 +38,30 @@ imdir = analysis_params.imdir;
 positions = length(pos_fnames);
 Nchan = length(channels);
 
+usedLED = analysis_params.usedLED; 
+
+
 for nn = 1:positions
     pos_fnames_nn = pos_fnames{nn}; % looping through each field of view
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> 3f136507fa15d551e3079b089f79bee987686f41
     for ch = 1:length(channels_to_image)
         channel_to_image = channels_to_image{ch};
+        channel_to_image_fieldname = channels_to_image_fieldname{ch};
         %get filenames and put them into a strucure
-        images0 = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan);
+        images0 = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan, channel_to_image_fieldname);
 
-        images.(channel_to_image) = images0.(channel_to_image);
+        images.(channel_to_image_fieldname) = images0.(channel_to_image_fieldname);
         %get times
-        [time_inds, time_valsCH.(channel_to_image)] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc);
+        [time_inds, time_valsCH.(channel_to_image_fieldname)] = get_image_times(fname_conv,imdir,channel_to_image,pos_fnames_nn,images,time_calc,usedLED , channel_to_image_fieldname);
         %time_inds should be the same - time vals might be slightly
         %different
     end
 
     %Make average time value for all channels at one position and time
-    time_vals = zeros(size(time_valsCH.(channels_to_image{1})));
-    for ch = 1:length(channels_to_image)
-        time_vals = time_vals + time_valsCH.(channels_to_image{ch});
+    time_vals = zeros(size(time_valsCH.(channels_to_image_fieldname{1})));
+    for ch = 1:length(channels_to_image_fieldname)
+        time_vals = time_vals + time_valsCH.(channels_to_image_fieldname{ch});
     end
-    time_vals = time_vals/length(channels_to_image);
+    time_vals = time_vals/length(channels_to_image_fieldname);
      
 
 %     else 
@@ -92,7 +92,7 @@ for nn = 1:positions
     cell_find_params.edge_margin = analysis_params.edge_margin;
 
 
-    timecoursedata = CovMapCells(imdir, images, time_vals, channels_to_image, cell_find_params);
+    timecoursedata = CovMapCells(imdir, images, time_vals, channels_to_image, cell_find_params, channels_to_image_fieldname);
     
     track_params.time_inds = time_inds;
     track_params.maxdisp = maxdisp;

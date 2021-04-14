@@ -17,6 +17,7 @@ based on JSO code for image analysis as of 12/12/12
 	(2)CovMapCells.m -- wrapper for analyzing data from a set of images from the same movie. 
 	(3)trackIDL.m -- finds tracks for each cell.  
 	(4)time_series_analysis.m -- wrapper to generate tracks for cells a set of movies from the same continuous experiment.  
+    (5)NEnrich.m -- calculates nuclear enrichment
 	
 Contact BMH if problems occur (heineike02@gmail.com)
 Original version (1.0) created by JSO (JacobStewartOrnstein@gmail.com)

@@ -20,19 +20,24 @@ from IPython.core.debugger import Tracer
 #is a powershell routine for this named FrameNoShift.ps1
 
 #imdirbase =  os.path.normpath('C:\Users\Ben\Documents\Data\PKA_project\\20160929_SC_NMPP1_Dose_Resp\Exp') + os.sep
-imdirbase = sys.argv[1]
+imdirbase = os.path.normpath(sys.argv[1]) + os.sep
+
+print(sys.argv)
 
 #nFrameOverride = 6
-if len(sys.argv[1:]) == 2:
-    nFrameOverride = int(sys.argv[2])
+if len(sys.argv) == 3:
+	#nFrameOverride = int(sys.argv[2])
+	raise ValueError('len sys.argv is too long'+str(sys.argv))  
 else:
     nFrameOverride = 0
 
 
 
-pos_names = os.walk(imdirbase).next()[1]
+#pos_names = next(os.walk(imdirbase))[1]
+pos_names = [filename for filename in os.listdir(imdirbase) if os.path.isdir(os.path.join(imdirbase,filename))]
 
-print 'creating simplified metadata file for files in ' + imdirbase
+
+print('creating simplified metadata file for files in ' + imdirbase)
 
 #use Directory structure to cycle through position names.
 
@@ -62,7 +67,7 @@ for pos in pos_names:
 
     if t0_new < t0: 
         t0 = t0_new
-        print t0, t0_new
+        print( str(t0) + ' ' + str(t0_new))
    
 
 for pos in pos_names: 

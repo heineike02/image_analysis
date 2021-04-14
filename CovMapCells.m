@@ -1,4 +1,4 @@
-function timecoursedata = CovMapCells(imdir, images, time_vals, channels_to_image, cell_find_params)
+function timecoursedata = CovMapCells(imdir, images, time_vals, channels_to_image, cell_find_params, channels_to_image_fieldname)
 %function which finds cells in a set of images
 %di = folder containing .tif images (string), 
 %images = list of image filenames to use in the form of a cell with N string entries.
@@ -25,9 +25,13 @@ function timecoursedata = CovMapCells(imdir, images, time_vals, channels_to_imag
 %Windows
 %path(path,'C:\Users\Ben\Google Drive\HES_Lab_Share\Scripts\JSO_Image_Analysis');
 
+%Sets cell_find_params.debug parameter to false - since it generates so
+%many images, if you want to set it to true, run it on a single image.
+cell_find_params.debug = false;
+
 imbg = cell_find_params.imbg;
 
-N = length(images.(channels_to_image{1}));
+N = length(images.(channels_to_image_fieldname{1}));
 
 if N ~= length(time_vals)
     'CovMapCells Warning: times not the same size as number of images.  This will occur if you removed bad images from the source directory and the metadata no longer matches the number of files'
@@ -58,8 +62,8 @@ timecoursedata(1:N,1) = timecoursedata(1);
 
 for jj = 1:N
 
-    for ch = 1:length(channels_to_image);
-        channel = channels_to_image{ch};
+    for ch = 1:length(channels_to_image)
+        channel = channels_to_image_fieldname{ch};
         imnames = images.(channel);
         imname = imnames(jj);
         cell_find_params.imbg = imbg.(channel);
@@ -95,9 +99,9 @@ for jj = 1:N
     elseif length(channels_to_image)==1
         %makes celldata have a channel field if there is only one channel
         %to remain consistant with multiple channel image data structure.
-        channel = channels_to_image{1};
+        channel = channels_to_image_fieldname{1};
         celldata_new = struct();
-        for mm = 1:length(celldata.(channel));
+        for mm = 1:length(celldata.(channel))
             celldata_fields = fields(celldata.(channel));
                 for kk = 1:length(celldata_fields)
                     celldata_new(mm).(celldata_fields{kk}).(channel) = celldata.(channel)(mm).(celldata_fields{kk});

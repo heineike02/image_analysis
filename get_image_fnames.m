@@ -1,4 +1,4 @@
-function images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan)
+function images = get_image_fnames(fname_conv,imdir,channel_to_image,pos_fnames_nn,Nchan, channel_to_image_fieldname)
 
 if strcmp(fname_conv,'JSO')
     images = struct();
@@ -33,7 +33,7 @@ elseif strcmp(fname_conv,'Micromanager')
     for mm = 1:nTimes
         images_cell{mm} = strcat(pos_fnames_nn,filesep,files(mm).name);
     end
-    images.(channel_to_image) = images_cell;
+    images.(channel_to_image_fieldname) = images_cell;
 elseif strcmp(fname_conv,'HCS_Nikon')
 elseif strcmp(fname_conv,'Metamorph')
     images = struct();

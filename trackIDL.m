@@ -38,6 +38,7 @@ mm = 1;
 for jj = 1:length(timecoursedata)
     %strcat('jj = ', int2str(jj))
     celldata = timecoursedata(jj).celldata;
+    %timecoursedata(jj).name
     nCells = length(celldata);
     for kk = 1:nCells
         %strcat('mm = ', int2str(mm))
